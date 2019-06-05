@@ -1,0 +1,8 @@
+*.pyc
+data/*
+
+#VSCODE SETTINGS
+.vscode/*
+
+
+__pycache__
