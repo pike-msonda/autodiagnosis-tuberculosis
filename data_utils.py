@@ -1,11 +1,11 @@
 from __future__ import division, print_function, absolute_import
 import os
 import csv
+import cv2
 import random
 import numpy as np
 from PIL import Image
 import pickle
-import csv
 import warnings
 import tensorflow as tf
 from urllib.parse import urlparse
@@ -33,7 +33,7 @@ def to_categorical(y, nb_classes=None):
 
 def load_image(in_image):
     # load image
-    img = Image.open(in_image)
+    img = cv2.imread(in_image)
     return img
 
 def resize_image(in_image, new_width, new_height, out_image=None,
