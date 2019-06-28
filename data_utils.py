@@ -69,13 +69,11 @@ def build_image_dataset_from_dir(directory,
 def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
                           filetypes=None):
     print("Starting to parse images...")
-    # import pdb; pdb.set_trace()
     if filetypes:
         if filetypes not in [list, tuple]: filetypes = list(filetypes)
     samples, targets = directory_to_samples(directory, flags=filetypes)
     for i, s in enumerate(samples):
         samples[i] = load_image(s)
-        # import pdb; pdb.set_trace()
         if resize:
             samples[i] = resize_image(samples[i], resize[0], resize[1])
         if convert_to_color:

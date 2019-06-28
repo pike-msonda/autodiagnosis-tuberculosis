@@ -1,5 +1,4 @@
 *.pyc
-data/*
 
 #VSCODE SETTINGS
 .vscode/*
