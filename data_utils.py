@@ -79,6 +79,7 @@ def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
         if convert_to_color:
             samples[i] = convert_color(samples[i],'RGB')
         samples[i] = pil_to_nparray(samples[i])
+        # import pdb; pdb.set_trace()
         samples[i] /= 255
     print("Parsing Done!")
     return samples, targets
