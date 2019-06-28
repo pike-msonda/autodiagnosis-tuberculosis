@@ -14,17 +14,17 @@ from keras import optimizers
 from sklearn import metrics
 
 DATASET_PATH = '../data'
-IMAGESET_NAME = os.path.join(DATASET_PATH, 'fruits.pkl')
+IMAGESET_NAME = os.path.join(DATASET_PATH, 'usa.pkl')
 
 if __name__ == "__main__":
     start = datetime.now()
-    # x, y = build_image_dataset_from_dir(os.path.join(DATASET_PATH, 'fruits'),
-    #     dataset_file=IMAGESET_NAME,
-    #     resize=(227,227),
-    #     filetypes=['.png', '.jpg', '.JPG'],
-    #     convert_to_color=False,
-    #     shuffle_data=True,
-    #     categorical_Y=True)
+    x, y = build_image_dataset_from_dir(os.path.join(DATASET_PATH, 'usa'),
+        dataset_file=IMAGESET_NAME,
+        resize=None,
+        filetypes=['.png'],
+        convert_to_color=False,
+        shuffle_data=True,
+        categorical_Y=True)
 
     # X_train, X_test, y_train, y_test = train_test_split(x,y, test_size=0.30, 
     #     random_state=1000)

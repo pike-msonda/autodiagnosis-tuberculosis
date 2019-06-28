@@ -33,7 +33,7 @@ def to_categorical(y, nb_classes=None):
 
 def load_image(in_image):
     # load image
-    img = cv2.imread(in_image)
+    img = Image.open(in_image)
     return img
 
 def resize_image(in_image, new_width, new_height, out_image=None,
@@ -69,17 +69,19 @@ def build_image_dataset_from_dir(directory,
 def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
                           filetypes=None):
     print("Starting to parse images...")
+    # import pdb; pdb.set_trace()
     if filetypes:
         if filetypes not in [list, tuple]: filetypes = list(filetypes)
     samples, targets = directory_to_samples(directory, flags=filetypes)
     for i, s in enumerate(samples):
         samples[i] = load_image(s)
+        # import pdb; pdb.set_trace()
         if resize:
             samples[i] = resize_image(samples[i], resize[0], resize[1])
         if convert_to_color:
             samples[i] = convert_color(samples[i],'RGB')
         samples[i] = pil_to_nparray(samples[i])
-        samples[i] /= 255.
+        samples[i] /= 255
     print("Parsing Done!")
     return samples, targets
 
@@ -90,8 +92,6 @@ def shuffle(*arrs):
         arrs[i] = np.array(arr)
     p = np.random.permutation(len(arrs[0]))
     return tuple(arr[p] for arr in arrs)
-
-
 
 def directory_to_samples(directory, flags=None, filter_channel=False):
     samples = []
