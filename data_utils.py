@@ -7,7 +7,6 @@ import numpy as np
 from PIL import Image
 import pickle
 import warnings
-import tensorflow as tf
 from urllib.parse import urlparse
 from urllib import request
 from io import BytesIO

@@ -40,8 +40,8 @@ from callbacks.history_callback import HistoryCallback
 
 WEIGHTS_PATH = 'http://redcatlabs.com/downloads/inception_v1_weights_tf_dim_ordering_tf_kernels.h5'
 WEIGHTS_PATH_NO_TOP = 'http://redcatlabs.com/downloads/inception_v1_weights_tf_dim_ordering_tf_kernels_notop.h5'
-DATASET_PATH = '../data'
-IMAGESET_NAME = os.path.join(DATASET_PATH, 'usa.pkl')
+DATASET_PATH = '../data/aug/all'
+IMAGESET_NAME = os.path.join(DATASET_PATH, 'turkey.pkl')
 
 # conv2d_bn is similar to (but updated from) inception_v3 version
 def conv2d_bn(x,
@@ -298,11 +298,11 @@ def InceptionV1(include_top=True,
 
 
 if __name__ == '__main__':
-    model = InceptionV1(include_top=True,weights=None, input_shape=(224,224,3), classes=2)
+    model = InceptionV1(include_top=True,weights=None, input_shape=(227,227,3), classes=2)
     model.summary()
-    x, y = build_image_dataset_from_dir(os.path.join(DATASET_PATH, 'png'),
+    x, y = build_image_dataset_from_dir(os.path.join(DATASET_PATH, 'turkey'),
         dataset_file=IMAGESET_NAME,
-        resize=(224,224),
+        resize=None,
         filetypes=['.png'],
         convert_to_color=True,
         shuffle_data=True,
