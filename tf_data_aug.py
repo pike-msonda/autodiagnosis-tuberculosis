@@ -12,22 +12,24 @@ IMAGE_PATH = ''
 
 SEED = 1000
 
-OUTPUT_PATH='../data' # Store the transformed image into the project folder
+IMAGE_PATH='../data' # Store the transformed image into the project folder
 IMAGE_PATH="D:\Data" #  Folder containing all the image to augment.
 AUG_PATH = 'data/aug'
 
-def resize(width=256, height=256):
-    for parentdir in os.listdir(IMAGE_PATH):
-       print("Reading sub-folders in {0} ".format(parentdir))
-       for subdir in os.listdir(os.path.join(IMAGE_PATH, parentdir)):
-           # Resize all images in subfolder and save to project folder
-           images = [i for i in os.listdir(os.path.join(IMAGE_PATH, parentdir, subdir)) if i.endswith('.png')]
-           for image in images:
-               img = Image.open(os.path.join(IMAGE_PATH, parentdir, subdir, image))
-               resized_image =  img.resize((width, height))
-               resized_image = resized_image.convert('RGB')
-               resized_image.save(os.path.join(OUTPUT_PATH, parentdir, subdir, image),)
-               print("File written to {0} resized to {1}".format(os.path.join(OUTPUT_PATH, parentdir, subdir, image), resized_image.size))
+def resize_images(filepath, width=256, height=256):
+    resized_images = []
+    tf.reset_default_graph()
+    imagePath = tf.placeholder(tf.string, name="inputFile")
+    imagePlaceholder = tf.io.decode_png(tf.read_file(imagePath))
+    resized_binary = tf.image.resize_images(imagePlaceholder, size=[IMAGE_SIZE,IMAGE_SIZE], method=tf.image.ResizeMethod.BILINEAR)
+    images = [i for i in os.listdir(os.path.join(filepath)) if i.endswith('.png')]
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        for image in images:
+            img = sess.run(resized_binary, feed_dict = {imagePath: os.path.join(filepath, image)})
+            resized_images.append(img)
+    np.array(resized_images, dtype = np.float32)
+    return resized_images
 
 def read_images(folder=None):
     x_images = []
@@ -38,13 +40,12 @@ def read_images(folder=None):
             img = img[:, :, :3]
         x_images.append(img)
     return x_images
+
 def save_images(filepath, images, prefix="untitled"):
-    # import pdb; pdb.set_trace()
     for index, image in enumerate(images):
         filename = filepath+'/'+prefix+'_'+str(index)+'.png'
         # imageToSave = Image.fromarray(image)
         mpimg.imsave(filename, image)
-        # import pdb; pdb.set_trace()
 
 def rotate_images(images):
     X_rotate = []
@@ -96,22 +97,22 @@ def random_crop(images, samples=2):
     return x_random_crops
 
 def add_augs():
-    for parentdir in os.listdir(OUTPUT_PATH):
-        if(parentdir == 'aug'):
-            pass
-        else:
-            print("Reading sub-folders in {0} ".format(parentdir))
-            for subdir in os.listdir(os.path.join(OUTPUT_PATH, parentdir)):
-                print("Reading sub-folders in {0} ".format(subdir))
-                images =  read_images(folder=os.path.join(OUTPUT_PATH, parentdir, subdir))
-                print("{} will be rotated and flipped".format(len(images)))
-                rotated_images = rotate_images(images)
-                print("Rotated {}".format(len(rotated_images)))
-                save_images(filepath='/'.join([OUTPUT_PATH, 'aug', parentdir, subdir]), images=rotated_images, prefix="rotation")
+    for parentdir in os.listdir(IMAGE_PATH):
+        print("Reading sub-folders in {0} ".format(parentdir))
+        for subdir in os.listdir(os.path.join(IMAGE_PATH, parentdir)):
+            print("Reading sub-folders in {0} ".format(subdir))
 
-                flipped_images = flip_images(images)
-                print("Flipped  {}".format(len(flipped_images)))
-                save_images(filepath='/'.join([OUTPUT_PATH, 'aug', parentdir, subdir]), images=flipped_images, prefix="mirror" )
+            images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
+            print("{} will be rotated and flipped".format(len(images)))
+            rotated_images = rotate_images(images)
+            print("Rotated {}".format(len(rotated_images)))
+            flipped_images = flip_images(rotated_images)
+            print("Flipped  {}".format(len(flipped_images)))
+
+            cropped_images = random_crop(flipped_images)
+            print("Cropped  {}".format(len(cropped_images)))
+            # import pdb; pdb.set_trace()
+            save_images(filepath='/'.join([AUG_PATH, 'all', parentdir, subdir]), images=cropped_images, prefix="cropped")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):
@@ -127,8 +128,8 @@ def create_dataset():
                 save_images(filepath='/'.join([AUG_PATH, 'all', parentdir, subdir]), images=cropped_images, prefix="cropped")
 
 if __name__ == "__main__":
-    # add_augs()
-    create_dataset()
+    add_augs()
+    # create_dataset()
     
                 
                 
