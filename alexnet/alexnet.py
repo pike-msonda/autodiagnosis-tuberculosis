@@ -17,7 +17,7 @@ class AlexNet:
         self.init = Input(input_shape)
         self.classes = classes
 
-    def conv_layer(self, x, filters,kernel_size, padding= "valid", 
+    def conv_layer(self, x, filters,kernel_size, padding= "VALID", 
             kernel_regularizer=l2(0), strides=(1,1), max_pooling=True, 
             activation="relu", name=None): 
 
@@ -46,31 +46,29 @@ class AlexNet:
         x =  self.conv_layer(self.init, filters=96, kernel_size=(11,11), strides=(4,4),
             padding="valid", max_pooling=True, activation='relu', name='conv_1')
 
-        x = BatchNormalization()(x)
-
-        # x = ZeroPadding2D(padding=(2,2))(x)
+        x = BatchNormalization()(x) # apply batch normalisation.
         # 2nd Layer
         x =  self.conv_layer(x, filters=256, kernel_size=(5,5),strides=(1,1),
-            padding="valid", max_pooling=True, name="conv_2")
-
-        x = BatchNormalization()(x)
-
-        # x = ZeroPadding2D(padding=(1,1))(x)
+            padding="VALID", max_pooling=True, name="conv_2")
+        
+        x = BatchNormalization()(x) # apply batch normalisation.
+        
         # 3RD LAYER
         x =  self.conv_layer(x, filters=384, kernel_size=(3,3),strides=(1,1),
-            padding="valid",max_pooling=False, name="conv_3")
+            padding="VALID",max_pooling=False, name="conv_3")
         
 
         # 4Th LAYER
         x =  self.conv_layer(x, filters=384, kernel_size=(3,3),strides=(1,1), 
-            padding="valid", max_pooling=False, name="conv_4")
+            padding="VALID", max_pooling=False, name="conv_4")
 
         # 5Th LAYER
         x =  self.conv_layer(x, filters=256, kernel_size=(3,3),strides=(1,1),
-            padding="valid", max_pooling=True, name="conv_5")
+            padding="VALID", max_pooling=True, name="conv_5")
 
         # 6 FLATTEN 
         x = Flatten()(x)
+
 
         # Fully Connected LAYER 1
         x = Dense(4096)(x)
@@ -82,9 +80,12 @@ class AlexNet:
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
 
+        x = Dense(1000)(x)
+        x = Activation('relu')(x)
+        # x = Dropout(0.5)(x)
         # FULLY CONNECTED LAYER 3
         output = self.output_layer(x, self.classes)
 
-        model = Model(self.init, output, name='AlexNet')
+        model = Model(self.init, output, name='AlexNet2')
 
         return model

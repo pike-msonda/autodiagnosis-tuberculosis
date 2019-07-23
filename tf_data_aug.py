@@ -13,14 +13,14 @@ IMAGE_PATH = ''
 SEED = 1000
 
 IMAGE_PATH='../data' # Store the transformed image into the project folder
-IMAGE_PATH="D:\Data" #  Folder containing all the image to augment.
+IMAGE_PATH="../Data" #  Folder containing all the image to augment.
 AUG_PATH = 'data/aug'
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
     tf.reset_default_graph()
     imagePath = tf.placeholder(tf.string, name="inputFile")
-    imagePlaceholder = tf.io.decode_png(tf.read_file(imagePath))
+    imagePlaceholder = tf.io.decode_png(tf.read_file(imagePath), dtype=tf.dtypes.uint8)
     resized_binary = tf.image.resize_images(imagePlaceholder, size=[IMAGE_SIZE,IMAGE_SIZE], method=tf.image.ResizeMethod.BILINEAR)
     images = [i for i in os.listdir(os.path.join(filepath)) if i.endswith('.png')]
     with tf.Session() as sess:
@@ -28,7 +28,7 @@ def resize_images(filepath, width=256, height=256):
         for image in images:
             img = sess.run(resized_binary, feed_dict = {imagePath: os.path.join(filepath, image)})
             resized_images.append(img)
-    np.array(resized_images, dtype = np.float32)
+    np.array(resized_images, dtype = np.uint8)
     return resized_images
 
 def read_images(folder=None):
@@ -44,13 +44,15 @@ def read_images(folder=None):
 def save_images(filepath, images, prefix="untitled"):
     for index, image in enumerate(images):
         filename = filepath+'/'+prefix+'_'+str(index)+'.png'
+        Image.fromarray(image, mode='RGB').save(filename)
+        # import pdb; pdb.set_trace()
         # imageToSave = Image.fromarray(image)
         mpimg.imsave(filename, image)
 
 def rotate_images(images):
     X_rotate = []
     tf.reset_default_graph()
-    X = tf.placeholder(tf.float32, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
+    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
     k = tf.placeholder(tf.int32)
     tf_img = tf.image.rot90(X, k = k)
     with tf.Session() as sess:
@@ -61,13 +63,13 @@ def rotate_images(images):
                 rotated_img = sess.run(tf_img, feed_dict = {X: img, k: i + 1})
                 X_rotate.append(rotated_img)
         
-    X_rotate = np.array(X_rotate, dtype = np.float32)
+    X_rotate = np.array(X_rotate, dtype =np.uint8)
     return X_rotate
     
 def flip_images(X_imgs):
     X_flip = []
     tf.reset_default_graph()
-    X = tf.placeholder(tf.float32, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
+    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
     tf_img1 = tf.image.flip_left_right(X)
     tf_img2 = tf.image.flip_up_down(X)
     tf_img3 = tf.image.transpose_image(X)
@@ -76,13 +78,13 @@ def flip_images(X_imgs):
         for img in X_imgs:
             flipped_imgs = sess.run([tf_img1, tf_img2, tf_img3], feed_dict = {X: img})
             X_flip.extend(flipped_imgs)
-    X_flip = np.array(X_flip, dtype = np.float32)
+    X_flip = np.array(X_flip, dtype = np.uint8)
     return X_flip
 
 def random_crop(images, samples=2):
     x_random_crops = []
     tf.reset_default_graph()
-    X = tf.placeholder(tf.float32, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
+    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
     
     tf_cache = tf.image.random_crop(X, [CROP_SIZE, CROP_SIZE,3], SEED)
     with tf.Session() as sess:
@@ -92,7 +94,7 @@ def random_crop(images, samples=2):
                 random_cropped_image = sess.run(tf_cache, feed_dict = {X: img})
                 x_random_crops.append(random_cropped_image)
 
-    x_random_crops = np.array(x_random_crops, dtype= np.float32)
+    x_random_crops = np.array(x_random_crops, dtype= np.uint8)
 
     return x_random_crops
 
