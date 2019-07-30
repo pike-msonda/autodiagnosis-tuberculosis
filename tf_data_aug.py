@@ -13,15 +13,16 @@ IMAGE_PATH = ''
 SEED = 1000
 
 IMAGE_PATH='../data' # Store the transformed image into the project folder
-IMAGE_PATH="../Data" #  Folder containing all the image to augment.
+IMAGE_PATH="D:\Data" #  Folder containing all the image to augment.
 AUG_PATH = 'data/aug'
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
     tf.reset_default_graph()
     imagePath = tf.placeholder(tf.string, name="inputFile")
-    imagePlaceholder = tf.io.decode_png(tf.read_file(imagePath), dtype=tf.dtypes.uint8)
+    imagePlaceholder = tf.io.decode_png(tf.read_file(imagePath),channels=3, dtype=tf.dtypes.uint8)
     resized_binary = tf.image.resize_images(imagePlaceholder, size=[IMAGE_SIZE,IMAGE_SIZE], method=tf.image.ResizeMethod.BILINEAR)
+    # normalisedImg = tf.image.per_image_standardization(resized_binary)
     images = [i for i in os.listdir(os.path.join(filepath)) if i.endswith('.png')]
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
@@ -47,7 +48,13 @@ def save_images(filepath, images, prefix="untitled"):
         Image.fromarray(image, mode='RGB').save(filename)
         # import pdb; pdb.set_trace()
         # imageToSave = Image.fromarray(image)
-        mpimg.imsave(filename, image)
+        # mpimg.imsave(filename, image)
+def applyClahe(images):
+    clahe = openCv.createCLAHE()
+    for img in images:
+        cl1 = clahe.apply(img)
+        openCv.imshow('Hello', cl1)
+        import pdb; pdb.set_trace()
 
 def rotate_images(images):
     X_rotate = []
@@ -105,16 +112,21 @@ def add_augs():
             print("Reading sub-folders in {0} ".format(subdir))
 
             images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
+            # import pdb; pdb.set_trace()
             print("{} will be rotated and flipped".format(len(images)))
             rotated_images = rotate_images(images)
-            print("Rotated {}".format(len(rotated_images)))
-            flipped_images = flip_images(rotated_images)
-            print("Flipped  {}".format(len(flipped_images)))
+            cropped_images_rot = random_crop(rotated_images)
+            print("Rotated {}".format(len(cropped_images_rot)))
+            save_images(filepath='/'.join([AUG_PATH, 'all', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
 
-            cropped_images = random_crop(flipped_images)
-            print("Cropped  {}".format(len(cropped_images)))
+            flipped_images = flip_images(images)
+            cropped_images_fli = random_crop(flipped_images)
+            print("Flipped  {}".format(len(flipped_images)))
+            
+            # im = applyClahe(images)
+            # print("Cropped  {}".format(len(cropped_images_fli)))
             # import pdb; pdb.set_trace()
-            save_images(filepath='/'.join([AUG_PATH, 'all', parentdir, subdir]), images=cropped_images, prefix="cropped")
+            save_images(filepath='/'.join([AUG_PATH, 'all', parentdir, subdir]), images=cropped_images_fli, prefix="flipped")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):

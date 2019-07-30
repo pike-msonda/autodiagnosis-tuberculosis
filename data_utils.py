@@ -129,10 +129,10 @@ def onehot_to_cat(y):
     return np.argmax(y, axis=1)
 
 def store_model(model, path,filename):
-    json_model = model.to_json()
-    with open(path+filename+".json", 'w') as file:
-        file.write(json_model)
-    model.save_weights(path+filename+".h5")
+    # json_model = model.to_json()
+    # with open(path+filename+".json", 'w') as file:
+    #     file.write(json_model)
+    model.save(path+filename+".h5")
 
 def get_labels(y_onehot):
     y = onehot_to_cat(y_onehot)

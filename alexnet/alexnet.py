@@ -82,8 +82,7 @@ class AlexNet:
 
         x = Dense(1000)(x)
         x = Activation('relu')(x)
-        # x = Dropout(0.5)(x)
-        # FULLY CONNECTED LAYER 3
+
         output = self.output_layer(x, self.classes)
 
         model = Model(self.init, output, name='AlexNet2')
