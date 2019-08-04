@@ -43,27 +43,27 @@ if __name__ == "__main__":
     alexnet = AlexNetSPP(classes=2)
     model = alexnet.model()
     model.summary()  
-    if not (os.path.exists('../models/alexnet.h5')):
-        print("Training with {0}".format(len(trainX)))
-        print("Testing with {0}".format(len(testX)))
+    # if not (os.path.exists('../models/alexnet.h5')):
+    #     print("Training with {0}".format(len(trainX)))
+    #     print("Testing with {0}".format(len(testX)))
 
-        # COMPILE MODEL
+    #     # COMPILE MODEL
        
-        model.compile(loss='categorical_crossentropy', optimizer=sgd,\
-        metrics=['accuracy'])
+    #     model.compile(loss='categorical_crossentropy', optimizer=sgd,\
+    #     metrics=['accuracy'])
 
-        #TRAIN MODEL
-        model.fit(X_train,y_train, batch_size=32, epochs=1, verbose=1, 
-           validation_data=(X_test, y_test), shuffle=True) #callbacks=[HistoryCallback('../history/history.csv')])
+    #     #TRAIN MODEL
+    #     model.fit(X_train,y_train, batch_size=32, epochs=1, verbose=1, 
+    #        validation_data=(X_test, y_test), shuffle=True) #callbacks=[HistoryCallback('../history/history.csv')])
         
-        score= model.evaluate(testX, testY, verbose=0)
-        print("%s: %.2f%%" % (model.metrics_names[1], score[1]))
-        store_model(model, "../models/", "alexnet")
-        y_pred =  model.predict(testX)
-        print(precision_recall_fscore_support(onehot_to_cat(testY), onehot_to_cat(y_pred)))
-        labels = list(set(get_labels(testY))) 
-        cm = confusion_matrix(get_labels(testY),get_labels(y_pred))
-        plot_confusion_matrix(cm, labels)
+    #     score= model.evaluate(testX, testY, verbose=0)
+    #     print("%s: %.2f%%" % (model.metrics_names[1], score[1]))
+    #     store_model(model, "../models/", "alexnet")
+    #     y_pred =  model.predict(testX)
+    #     print(precision_recall_fscore_support(onehot_to_cat(testY), onehot_to_cat(y_pred)))
+    #     labels = list(set(get_labels(testY))) 
+    #     cm = confusion_matrix(get_labels(testY),get_labels(y_pred))
+    #     plot_confusion_matrix(cm, labels)
     # else:
 
     #     labels = list(set(get_labels(testY))) 
