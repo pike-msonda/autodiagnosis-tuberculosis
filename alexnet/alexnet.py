@@ -77,7 +77,7 @@ class AlexNet:
         ouput  = Activation("softmax",name="softmax")(x)
 
 
-        model = Model(input=self.init, output=ouput)
+        model = Model(input=self.init, output=ouput, name="alexnet")
 
         if self.weights_path:
             model.load_weights(self.weights_path)
