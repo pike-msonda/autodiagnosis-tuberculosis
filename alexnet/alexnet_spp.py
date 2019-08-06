@@ -10,7 +10,7 @@ from keras.layers.convolutional import MaxPooling2D, AveragePooling2D, ZeroPaddi
 from keras.layers.normalization import BatchNormalization
 from keras.models import Model
 from keras.regularizers import l2
-from spp.SpatialPyramidPooling import SpatialPyramidPooling
+from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 
 class AlexNetSPP:
 
@@ -82,8 +82,8 @@ class AlexNetSPP:
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
 
-        x = Dense(1000)(x)
-        x = Activation('relu')(x)
+        # x = Dense(1000)(x)
+        # x = Activation('relu')(x)
 
         output = self.output_layer(x, self.classes)
 

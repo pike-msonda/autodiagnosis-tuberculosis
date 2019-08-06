@@ -8,7 +8,6 @@ from datetime import datetime
 from sklearn.model_selection import train_test_split 
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import confusion_matrix
-from callbacks.history_callback import HistoryCallback
 from keras.models import load_model
 from keras import optimizers
 from sklearn import metrics
@@ -20,25 +19,25 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'usa.pkl')
 
 if __name__ == "__main__":
     start = datetime.now()
-    trainX, trainY = build_image_dataset_from_dir(os.path.join(DATASET_PATH, 'usa'),
-        dataset_file=IMAGESET_NAME,
-        resize=None,
-        filetypes=['.png'],
-        convert_to_color=True,
-        shuffle_data=True,
-        categorical_Y=True)
+    # trainX, trainY = build_image_dataset_from_dir(os.path.join(DATASET_PATH, 'usa'),
+    #     dataset_file=IMAGESET_NAME,
+    #     resize=None,
+    #     filetypes=['.png'],
+    #     convert_to_color=True,
+    #     shuffle_data=True,
+    #     categorical_Y=True)
 
-    testX, testY = build_image_dataset_from_dir(os.path.join(TEST_PATH, 'usa'),
-        dataset_file=TEST_PATH_NAME,
-        resize=None,
-        filetypes=['.png'],
-        convert_to_color=True,
-        shuffle_data=True,
-        categorical_Y=True)
-    # import pdb; pdb.set_trace()
-    X_train, X_test, y_train, y_test = train_test_split(trainX,trainY, test_size=0.30, 
-        random_state=1000)
-    sgd = optimizers.SGD(lr=0.01, momentum=0.9, decay=0.0005,nesterov=False)
+    # testX, testY = build_image_dataset_from_dir(os.path.join(TEST_PATH, 'usa'),
+    #     dataset_file=TEST_PATH_NAME,
+    #     resize=None,
+    #     filetypes=['.png'],
+    #     convert_to_color=True,
+    #     shuffle_data=True,
+    #     categorical_Y=True)
+    # # import pdb; pdb.set_trace()
+    # X_train, X_test, y_train, y_test = train_test_split(trainX,trainY, test_size=0.30, 
+    #     random_state=1000)
+    # sgd = optimizers.SGD(lr=0.01, momentum=0.9, decay=0.0005,nesterov=False)
 
     alexnet = AlexNetSPP(classes=2)
     model = alexnet.model()

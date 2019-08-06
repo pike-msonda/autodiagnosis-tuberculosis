@@ -2,11 +2,13 @@ import numpy as np
 from keras.models import Sequential, Model
 from keras.layers import Flatten, Dense, Dropout, Reshape, Permute, Activation, Input, merge
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
-from keras.layers.convolutional import Convolution2D, MaxPooling2D, ZeroPadding2D
+from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, concatenate, MaxPooling2D, ZeroPadding2D
 from keras.optimizers import SGD
 from keras import backend as K
 from scipy.misc import imread, imresize, imsave
-from custom_layers.crosschannelnormalisation import crosschannelnormalization,splittensor
+from custom_layers.lrn_layer import LRN
+from custom_layers.crosschannelnormalisation import splittensor
+from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 K.set_image_dim_ordering('th')
 class AlexNet:
 
@@ -18,48 +20,49 @@ class AlexNet:
     def model(self):  
 
         # COVOLUTIONAL LAYER 1  
-        x = Convolution2D(96, 11, 11,subsample=(4,4),activation='relu',
+        x = Conv2D(96, (11,  11),strides=(4,4),activation='relu',
                             name='conv_1')(self.init)
 
         x = MaxPooling2D((3, 3), strides=(2,2))(x)
-        x = crosschannelnormalization(name="convpool_1")(x) # normalisation instead of Batch Normalisation
+        x = LRN(name="convpool_1")(x) # normalisation instead of Batch Normalisation
         x = ZeroPadding2D((2,2))(x)
 
         # COVOLUTIONAL LAYER 2  
-        x = merge([
-            Convolution2D(128,5,5,activation="relu",name='conv_2_'+str(i+1))(
+        x = concatenate([
+            Conv2D(128,(5,5),activation="relu",name='conv_2_'+str(i+1))(
 
                 splittensor(ratio_split=2,id_split=i)(x)
 
-            ) for i in range(2)], mode='concat',concat_axis=1,name="conv_2")
+            ) for i in range(2)],axis=1,name="conv_2")
 
         x = MaxPooling2D((3, 3), strides=(2, 2))(x)
-        x = crosschannelnormalization()(x)
+        x = LRN()(x)
         x = ZeroPadding2D((1,1))(x)
 
         # COVOLUTIONAL LAYER 3 
-        x = Convolution2D(384,3,3,activation='relu',name='conv_3')(x)
+        x = Conv2D(384,(3,3),activation='relu',name='conv_3')(x)
 
         x = ZeroPadding2D((1,1))(x)
-        x = merge([
-            Convolution2D(192,3,3,activation="relu",name='conv_4_'+str(i+1))(
+        x = concatenate([
+            Conv2D(192,(3,3),activation="relu",name='conv_4_'+str(i+1))(
 
                 splittensor(ratio_split=2,id_split=i)(x)
 
-            ) for i in range(2)], mode='concat',concat_axis=1,name="conv_4")
+            ) for i in range(2)], axis=1,name="conv_4")
         x = ZeroPadding2D((1,1))(x)
 
 
         # COVOLUTIONAL LAYER 5 
-        x = merge([
-            Convolution2D(128,3,3,activation="relu",name='conv_5_'+str(i+1))(
+        x = concatenate([
+            Conv2D(128,(3,3),activation="relu",name='conv_5_'+str(i+1))(
 
                 splittensor(ratio_split=2,id_split=i)(x)
-            ) for i in range(2)], mode='concat',concat_axis=1,name="conv_5")
+            ) for i in range(2)],axis=1,name="conv_5")
 
         x = MaxPooling2D((3, 3), strides=(2,2),name="convpool_5")(x)
 
-
+        # import pdb; pdb.set_trace()
+        # x = SpatialPyramidPooling([1, 2, 4])(x)
         # Flatten Tensor
         x = Flatten(name="flatten")(x)
 
