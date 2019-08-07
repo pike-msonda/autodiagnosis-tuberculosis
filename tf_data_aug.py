@@ -12,9 +12,8 @@ IMAGE_PATH = ''
 
 SEED = 1000
 
-IMAGE_PATH='../data' # Store the transformed image into the project folder
-IMAGE_PATH="D:\Data" #  Folder containing all the image to augment.
-AUG_PATH = 'data/aug'
+AUG_PATH='data' # Store the transformed image into the project folder
+IMAGE_PATH="D:\Data/train" #  Folder containing all the image to augment.
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
@@ -101,13 +100,15 @@ def add_augs():
             rotated_images = rotate_images(images)
             cropped_images_rot = random_crop(rotated_images)
             print("Rotated {}".format(len(cropped_images_rot)))
-            save_images(filepath='/'.join([AUG_PATH, 'all', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
+            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
 
             flipped_images = flip_images(images)
             cropped_images_fli = random_crop(flipped_images)
             print("Flipped  {}".format(len(flipped_images)))
-            
-            save_images(filepath='/'.join([AUG_PATH, 'all', parentdir, subdir]), images=cropped_images_fli, prefix="flipped")
+            # im = applyClahe(images)
+            # print("Cropped  {}".format(len(cropped_images_fli)))
+            # import pdb; pdb.set_trace()
+            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_fli, prefix="flipped")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):
