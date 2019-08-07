@@ -1,19 +1,10 @@
-import numpy as np
 import sys
 sys.path.append("..") 
 from data_utils import *
-import tensorflow as tf
 from alexnet import AlexNet
 from datetime import datetime
-from sklearn.model_selection import train_test_split 
-from sklearn.metrics import precision_recall_fscore_support
-from sklearn.metrics import confusion_matrix
-from keras.models import load_model
-from keras import optimizers
-from sklearn import metrics
 from utils.model_utils import ModelUtils
 
-# from keras.backend import manual_variable_initialization(True)
 DATASET_PATH = '../data/train/'
 TEST_PATH = 'D:\Data/test/'
 TEST_PATH_NAME=os.path.join(TEST_PATH, 'china.pkl')

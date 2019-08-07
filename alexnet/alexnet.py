@@ -6,8 +6,9 @@ from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, concatenat
 from keras.optimizers import SGD
 from keras import backend as K
 from scipy.misc import imread, imresize, imsave
+from custom_layers.pool_helper import PoolHelper
 from custom_layers.lrn_layer import LRN
-from custom_layers.crosschannelnormalisation import splittensor
+from custom_layers.crosschannelnormalisation import splittensor,crosschannelnormalization
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 K.set_image_dim_ordering('th')
 class AlexNet:
@@ -36,6 +37,7 @@ class AlexNet:
             ) for i in range(2)],axis=1,name="conv_2")
 
         x = MaxPooling2D((3, 3), strides=(2, 2))(x)
+        x = PoolHelper()
         x = LRN()(x)
         x = ZeroPadding2D((1,1))(x)
 

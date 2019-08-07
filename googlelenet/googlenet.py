@@ -1,12 +1,14 @@
 from __future__ import print_function
 import numpy as np
 import keras
+from keras import backend as K
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D, AveragePooling2D, ZeroPadding2D, Dropout, Flatten, Concatenate, Reshape, Activation
 from keras.models import Model
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
-from keras.optimizers import SGD
-from googlenet_custom_layers import *
+from custom_layers.pool_helper import PoolHelper
+from custom_layers.lrn_layer import LRN
+from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 K.set_image_data_format('channels_first')
 if keras.backend.backend() == 'tensorflow':
     from keras import backend as K
@@ -75,10 +77,11 @@ class GoogleNet:
 
         loss1_ave_pool = AveragePooling2D(pool_size=(5,5), strides=(3,3), name='loss1/ave_pool')(inception_4a_output)
         loss1_conv = Conv2D(128, (1,1), padding='same', activation='relu', name='loss1/conv', kernel_regularizer=l2(0.0002))(loss1_ave_pool)
+        # spp1 = SpatialPyramidPooling([1, 2, 4])(loss1_conv)
         loss1_flat = Flatten()(loss1_conv)
         loss1_fc = Dense(1024, activation='relu', name='loss1/fc', kernel_regularizer=l2(0.0002))(loss1_flat)
         loss1_drop_fc = Dropout(rate=0.7)(loss1_fc)
-        loss1_classifier = Dense(1000, name='loss1/classifier', kernel_regularizer=l2(0.0002))(loss1_drop_fc)
+        loss1_classifier = Dense(self.classes, name='loss1/classifier', kernel_regularizer=l2(0.0002))(loss1_drop_fc)
         loss1_classifier_act = Activation('softmax')(loss1_classifier)
 
         inception_4b_1x1 = Conv2D(160, (1,1), padding='same', activation='relu', name='inception_4b/1x1', kernel_regularizer=l2(0.0002))(inception_4a_output)
@@ -116,10 +119,11 @@ class GoogleNet:
 
         loss2_ave_pool = AveragePooling2D(pool_size=(5,5), strides=(3,3), name='loss2/ave_pool')(inception_4d_output)
         loss2_conv = Conv2D(128, (1,1), padding='same', activation='relu', name='loss2/conv', kernel_regularizer=l2(0.0002))(loss2_ave_pool)
+        # spp2 = SpatialPyramidPooling([1, 2, 4])(loss2_conv)
         loss2_flat = Flatten()(loss2_conv)
         loss2_fc = Dense(1024, activation='relu', name='loss2/fc', kernel_regularizer=l2(0.0002))(loss2_flat)
         loss2_drop_fc = Dropout(rate=0.7)(loss2_fc)
-        loss2_classifier = Dense(1000, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
+        loss2_classifier = Dense(self.classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
         loss2_classifier_act = Activation('softmax')(loss2_classifier)
 
         inception_4e_1x1 = Conv2D(256, (1,1), padding='same', activation='relu', name='inception_4e/1x1', kernel_regularizer=l2(0.0002))(inception_4d_output)
@@ -160,12 +164,13 @@ class GoogleNet:
         inception_5b_output = Concatenate(axis=1, name='inception_5b/output')([inception_5b_1x1,inception_5b_3x3,inception_5b_5x5,inception_5b_pool_proj])
 
         pool5_7x7_s1 = AveragePooling2D(pool_size=(7,7), strides=(1,1), name='pool5/7x7_s2')(inception_5b_output)
+        # spp3 = SpatialPyramidPooling([1, 2, 4])(pool5_7x7_s1)
         loss3_flat = Flatten()(pool5_7x7_s1)
         pool5_drop_7x7_s1 = Dropout(rate=0.4)(loss3_flat)
         loss3_classifier = Dense(self.classes, name='loss3/classifier', kernel_regularizer=l2(0.0002))(pool5_drop_7x7_s1)
         loss3_classifier_act = Activation('softmax', name='prob')(loss3_classifier)
 
-        googlenet = Model(inputs=self.input, outputs=[loss1_classifier_act,loss2_classifier_act,loss3_classifier_act])
+        googlenet = Model(inputs=self.input, outputs=[loss1_classifier_act,loss2_classifier_act,loss3_classifier_act], name="googlenet")
 
         if self.weights_path:
             googlenet.load_weights(self.weights_path)

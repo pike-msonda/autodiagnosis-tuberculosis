@@ -14,16 +14,16 @@ class ModelUtils():
         self.validation=validation_split
 
 
-    def get_train_data(self, name='china', folder='../data/train/'):
+    def get_train_data(self, name='usa', folder='../data/train/', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
-            resize=None,
+            resize=resize,
             filetypes=['.png'],
             convert_to_color=True,
             shuffle_data=True,
             categorical_Y=True)
 
-    def get_test_data(self, name='china', folder='D:\Data/test/'):
+    def get_test_data(self, name='usa', folder='D:\Data/test/', resize=None):
         self.testX, self.testY = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
             resize=None,
@@ -46,7 +46,10 @@ class ModelUtils():
             self.model.load_weights('../models/'+self.model.name+'.h5') 
             self.model.evaluate(self.x, self.y, verbose=0)
         else:
-            self.history = self.model.fit(self.x, self.y, 32, self.epochs, verbose=1, 
+            if(self.model.name == 'googlenet'):
+                self.y = [self.y,self.y, self.y] # because GoogleNet has 3 outputs
+
+            self.history = self.model.fit(self.x,self.y, 32, self.epochs, verbose=1, 
                 validation_split=self.validation,shuffle=True)
 
         
