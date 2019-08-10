@@ -4,7 +4,7 @@ import keras as ke
 from keras.optimizers import SGD
 from sklearn.metrics import confusion_matrix
 from keras.models import load_model
-from data_utils import build_image_dataset_from_dir, get_labels, onehot_to_cat, plot_confusion_matrix
+from data_utils import build_image_dataset_from_dir, get_labels, onehot_to_cat, plot_confusion_matrix, plot_accuracy_loss_graph
 from keras import backend as K
 class ModelUtils():
 
@@ -14,7 +14,7 @@ class ModelUtils():
         self.validation=validation_split
 
 
-    def get_train_data(self, name='usa', folder='../data/train/', resize=None):
+    def get_train_data(self, name='turkey', folder='../data/train/', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
             resize=resize,
@@ -23,7 +23,7 @@ class ModelUtils():
             shuffle_data=True,
             categorical_Y=True)
 
-    def get_test_data(self, name='usa', folder='D:\Data/test/', resize=None):
+    def get_test_data(self, name='turkey', folder='D:\Data/test/', resize=None):
         self.testX, self.testY = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
             resize=None,
@@ -70,3 +70,6 @@ class ModelUtils():
         cm = confusion_matrix(get_labels(self.testY),get_labels(predictions))
         print("Confusion Matrix {}".format(cm))
         plot_confusion_matrix(cm, labels, title=self.model.name)
+
+    def plot_loss_accuracy():
+        plot_accuracy_loss_graph(self.history)

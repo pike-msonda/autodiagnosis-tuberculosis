@@ -10,7 +10,7 @@ from custom_layers.pool_helper import PoolHelper
 from custom_layers.lrn_layer import LRN
 from custom_layers.crosschannelnormalisation import splittensor,crosschannelnormalization
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
-K.set_image_dim_ordering('tf')
+K.set_image_data_format('channels_first')
 class AlexNet:
 
     def __init__(self, input_shape, classes, weights_path=None):
@@ -40,7 +40,7 @@ class AlexNet:
         x = LRN()(x)
         x = ZeroPadding2D((1,1))(x)
 
-        # COVOLUTIONAL LAYER 3 
+        # COVOLUTIONAL LAYER 4 
         x = Conv2D(384,(3,3),activation='relu',name='conv_3')(x)
 
         x = ZeroPadding2D((1,1))(x)
@@ -50,14 +50,15 @@ class AlexNet:
                 splittensor(ratio_split=2,id_split=i)(x)
 
             ) for i in range(2)], axis=1,name="conv_4")
+
+
         x = ZeroPadding2D((1,1))(x)
-
-
         # COVOLUTIONAL LAYER 5 
         x = concatenate([
             Conv2D(128,(3,3),activation="relu",name='conv_5_'+str(i+1))(
 
                 splittensor(ratio_split=2,id_split=i)(x)
+
             ) for i in range(2)],axis=1,name="conv_5")
 
         x = MaxPooling2D((3, 3), strides=(2,2),name="convpool_5")(x)
