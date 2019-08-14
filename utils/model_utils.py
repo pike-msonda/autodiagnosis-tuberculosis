@@ -14,7 +14,7 @@ class ModelUtils():
         self.validation=validation_split
 
 
-    def get_train_data(self, name='turkey', folder='../data/train/', resize=None):
+    def get_train_data(self, name='usa', folder='../data/train/', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
             resize=resize,
@@ -23,7 +23,7 @@ class ModelUtils():
             shuffle_data=True,
             categorical_Y=True)
 
-    def get_test_data(self, name='turkey', folder='D:\Data/test/', resize=None):
+    def get_test_data(self, name='usa', folder='D:\Data/test/', resize=None):
         self.testX, self.testY = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
             resize=None,
@@ -71,5 +71,5 @@ class ModelUtils():
         print("Confusion Matrix {}".format(cm))
         plot_confusion_matrix(cm, labels, title=self.model.name)
 
-    def plot_loss_accuracy():
+    def plot_loss_accuracy(self):
         plot_accuracy_loss_graph(self.history)

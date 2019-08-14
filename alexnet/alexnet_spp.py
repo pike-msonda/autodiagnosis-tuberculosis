@@ -10,7 +10,7 @@ from custom_layers.pool_helper import PoolHelper
 from custom_layers.lrn_layer import LRN
 from custom_layers.crosschannelnormalisation import splittensor,crosschannelnormalization
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
-K.set_image_dim_ordering('th')
+K.set_image_data_format('channels_first')
 class AlexNetSPP:
 
     def __init__(self, input_shape, classes, weights_path=None):
@@ -62,7 +62,7 @@ class AlexNetSPP:
 
         x = MaxPooling2D((3, 3), strides=(2,2),name="convpool_5")(x)
 
-        x = SpatialPyramidPooling([1,3,4])(x)
+        x = SpatialPyramidPooling([1,2,3,4,])(x)
 
 
         # FUlly connected layer 1
@@ -79,7 +79,7 @@ class AlexNetSPP:
         ouput  = Activation("softmax",name="softmax")(x)
 
 
-        model = Model(input=self.init, output=ouput, name="alexnet")
+        model = Model(inputs=self.init, outputs=ouput, name="alexnet")
 
         # if self.weights_path:
         #     model.load_weights(self.weights_path)

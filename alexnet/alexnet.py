@@ -1,12 +1,9 @@
 import numpy as np
+import h5py
 from keras.models import Sequential, Model
-from keras.layers import Flatten, Dense, Dropout, Reshape, Permute, Activation, Input, merge
-from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
-from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, concatenate, MaxPooling2D, ZeroPadding2D
-from keras.optimizers import SGD
+from keras.layers import Dense,Input, Dropout, Flatten, Activation, Conv2D, concatenate, MaxPooling2D, ZeroPadding2D
+from keras.layers.normalization import BatchNormalization
 from keras import backend as K
-from scipy.misc import imread, imresize, imsave
-from custom_layers.pool_helper import PoolHelper
 from custom_layers.lrn_layer import LRN
 from custom_layers.crosschannelnormalisation import splittensor,crosschannelnormalization
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
@@ -25,6 +22,7 @@ class AlexNet:
                             name='conv_1')(self.init)
 
         x = MaxPooling2D((3, 3), strides=(2,2))(x)
+        # x = BatchNormalization(axis=3)(x)
         x = LRN(name="convpool_1")(x) # normalisation instead of Batch Normalisation
         x = ZeroPadding2D((2,2))(x)
 
@@ -37,7 +35,8 @@ class AlexNet:
             ) for i in range(2)],axis=1,name="conv_2")
 
         x = MaxPooling2D((3, 3), strides=(2, 2))(x)
-        x = LRN()(x)
+        # x = BatchNormalization(axis=3)(x)
+        x = LRN(name="convpool_2")(x)
         x = ZeroPadding2D((1,1))(x)
 
         # COVOLUTIONAL LAYER 4 
@@ -75,6 +74,7 @@ class AlexNet:
         x = Dense(4096, activation='relu',name='dense_2')(x)
         x = Dropout(0.5)(x)
         
+        # x = Dense(1000, activation='relu',name='dense_3')(x)
 
         # OUTPUT Layer
         x = Dense(self.classes,name='dense_3')(x)
@@ -84,6 +84,7 @@ class AlexNet:
         model = Model(input=self.init, output=ouput, name="alexnet")
 
         if self.weights_path:
+            import pdb; pdb.set_trace()
             model.load_weights(self.weights_path)
 
         return model

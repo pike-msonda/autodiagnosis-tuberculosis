@@ -17,15 +17,16 @@ if __name__ == "__main__":
 
     model = alexnet.model()
 
-    model.summary()
+    # model.summary()
 
-    # util = ModelUtils(epochs=40)
-    # util.get_train_data()
-    # util.get_test_data()
-    # util.train(model)
-    # util.evaluate()
-    # util.save()
-    # util.confusion_matrix()
+    util = ModelUtils(epochs=20)
+    util.get_train_data()
+    util.get_test_data()
+    util.train(model)
+    util.evaluate()
+    util.save()
+    util.confusion_matrix()
+    util.plot_loss_accuracy()
     
     time_elapsed = datetime.now() - start 
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
