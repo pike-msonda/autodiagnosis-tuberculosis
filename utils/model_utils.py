@@ -18,7 +18,7 @@ class ModelUtils():
         self.validation=validation_split
 
 
-    def get_train_data(self, name=FOLDER, folder='D:\Data/test/', resize=None):
+    def get_train_data(self, name=FOLDER, folder='../data/train/', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
             resize=resize,
@@ -44,7 +44,6 @@ class ModelUtils():
 
 
         if(K.image_dim_ordering() == 'th'):
-            import pdb; pdb.set_trace()
             self.x = np.moveaxis(self.x, -1, 1)
             self.valX = np.moveaxis(self.valX, -1, 1)
             self.testX = np.moveaxis(self.testX, -1, 1)
@@ -57,7 +56,7 @@ class ModelUtils():
                 self.y = [self.y,self.y, self.y] # because GoogleNet has 3 outputs
                 self.valY = [self.valY, self.valY, self.valY]
 
-            self.history = self.model.fit(self.x,self.y, 5, self.epochs, verbose=1, 
+            self.history = self.model.fit(self.x,self.y, 32, self.epochs, verbose=1, 
                 validation_data=(self.valX, self.valY),shuffle=True)
 
         
@@ -73,7 +72,7 @@ class ModelUtils():
         self.model.save_weights(folder+'/'+self.model.name+'.h5')
 
     def optimizer(self):
-        return SGD(lr=0.01, momentum=0.9, decay=0.0005,nesterov=False)
+        return SGD(lr=0.01, momentum=0.9, decay=0.0005,nesterov=True)
 
     def confusion_matrix(self):
         predictions = self.model.predict(self.testX)
