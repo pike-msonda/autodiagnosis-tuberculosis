@@ -9,7 +9,7 @@ from data_utils import build_image_dataset_from_dir, get_labels, onehot_to_cat, 
 from keras import backend as K
 
 
-FOLDER = 'usa'
+FOLDER = 'turkey'
 class ModelUtils():
 
     def __init__(self, epochs=2,test_split=0.30, validation_split=0.3):
@@ -18,7 +18,7 @@ class ModelUtils():
         self.validation=validation_split
 
 
-    def get_train_data(self, name=FOLDER, folder='D:\Data/test/', resize=None):
+    def get_train_data(self, name=FOLDER, folder='../data/train/', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),
             dataset_file=os.path.join(folder, name+'.pkl'),
             resize=resize,
@@ -26,7 +26,7 @@ class ModelUtils():
             convert_to_color=True,
             shuffle_data=True,
             categorical_Y=True)
-        self.x, self.valX, self.y, self.valY =  train_test_split(self.x, self.y, test_size=self.test_split, random_state=1000)
+        self.x, self.valX, self.y, self.valY = train_test_split(self.x, self.y, test_size=self.test_split, random_state=1000)
 
     def get_test_data(self, name=FOLDER, folder='D:\Data/test/', resize=None):
         self.testX, self.testY = build_image_dataset_from_dir(os.path.join(folder, name),
@@ -57,7 +57,7 @@ class ModelUtils():
                 self.y = [self.y,self.y, self.y] # because GoogleNet has 3 outputs
                 self.valY = [self.valY, self.valY, self.valY]
 
-            self.history = self.model.fit(self.x,self.y, 5, self.epochs, verbose=1, 
+            self.history = self.model.fit(self.x,self.y, 32, self.epochs, verbose=1, 
                 validation_data=(self.valX, self.valY),shuffle=True)
 
         

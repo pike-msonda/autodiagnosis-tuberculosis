@@ -13,7 +13,7 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
-    alexnet = AlexNet(input_shape=(3, 256,256), classes=2, weights_path='')
+    alexnet = AlexNet(input_shape=(227,227, 3), classes=2, weights_path='')
 
     model = alexnet.model()
 

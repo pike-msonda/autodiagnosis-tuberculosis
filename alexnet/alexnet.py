@@ -1,92 +1,89 @@
-import numpy as np
-import h5py
-from keras.models import Sequential, Model
-from keras.layers import Dense,Input, Dropout, Flatten, Activation, Conv2D, concatenate, MaxPooling2D, ZeroPadding2D
+"""
+    Author: Pike Msonda
+    Description: AlexNet implementation using Keras api
+"""
+
+from keras.layers import Input
+from keras.layers.merge import concatenate
+from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D
+from keras.layers.convolutional import MaxPooling2D, AveragePooling2D, ZeroPadding2D
 from keras.layers.normalization import BatchNormalization
-from keras import backend as K
-from custom_layers.lrn_layer import LRN
-from custom_layers.pool_helper import PoolHelper
-from custom_layers.crosschannelnormalisation import splittensor,crosschannelnormalization
-from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
-K.set_image_data_format('channels_first')
+from keras.models import Model
+from keras.regularizers import l2
+
 class AlexNet:
 
-    def __init__(self, input_shape, classes, weights_path=None):
+    def __init__(self, input_shape, classes, weights_path=''):
         self.init = Input(input_shape)
         self.classes = classes
         self.weights_path = weights_path
 
-    def model(self):  
+    def conv_layer(self, x, filters,kernel_size, padding= "same", 
+            kernel_regularizer=l2(0), strides=(1,1), max_pooling=True, 
+            activation="relu", name=None): 
 
-        # COVOLUTIONAL LAYER 1  
-        x = Conv2D(96, (11,  11),strides=(4,4),activation='relu',
-                            name='conv_1')(self.init)
-        
-        x = MaxPooling2D((3, 3), strides=(2,2))(x)
-        # x = BatchNormalization(axis=3)(x)
-        x = LRN(name="convpool_1")(x) # normalisation instead of Batch Normalisation
-        x = ZeroPadding2D((2,2))(x)
+        x = Conv2D(filters, kernel_size, strides=strides, padding=padding, 
+            activation=activation)(x)
+        if (max_pooling):
+            x = MaxPooling2D(pool_size=(3,3), strides=(2,2))(x)
+ 
+        return x
 
-        # COVOLUTIONAL LAYER 2  
-        x = concatenate([
-            Conv2D(128,(5,5),activation="relu",name='conv_2_'+str(i+1))(
-
-                splittensor(ratio_split=2,id_split=i)(x)
-
-            ) for i in range(2)],axis=1,name="conv_2")
-
-        x = MaxPooling2D((3, 3), strides=(2, 2))(x)
-        # x = BatchNormalization(axis=3)(x)
-        x = LRN(name="convpool_2")(x)
-        x = ZeroPadding2D((1,1))(x)
-
-        # COVOLUTIONAL LAYER 4 
-        x = Conv2D(384,(3,3),activation='relu',name='conv_3')(x)
-
-        x = ZeroPadding2D((1,1))(x)
-        x = concatenate([
-            Conv2D(192,(3,3),activation="relu",name='conv_4_'+str(i+1))(
-
-                splittensor(ratio_split=2,id_split=i)(x)
-
-            ) for i in range(2)], axis=1,name="conv_4")
-
-
-        x = ZeroPadding2D((1,1))(x)
-        # COVOLUTIONAL LAYER 5 
-        x = concatenate([
-            Conv2D(128,(3,3),activation="relu",name='conv_5_'+str(i+1))(
-
-                splittensor(ratio_split=2,id_split=i)(x)
-
-            ) for i in range(2)],axis=1,name="conv_5")
-
-        x = MaxPooling2D((3, 3), strides=(2,2),name="convpool_5")(x)
-
-        # x = SpatialPyramidPooling([1, 2, 4])(x)
-        # Flatten Tensor
-        x = Flatten(name="flatten")(x)
-
-        # FUlly connected layer 1
-        x = Dense(4096, activation='relu',name='dense_1')(x)
-        x = Dropout(0.5)(x)
-
-        # FUlly connected layer 2
-        x = Dense(4096, activation='relu',name='dense_2')(x)
+    def output_layer(self,x, classes):
+        x = Dense(units=classes)(x)
+        x = Activation('softmax')(x)
+        return x
+    
+    def dense_layer(self,x,units):
+        x = Dense(units)(x)
+        x = Activation('relu')(x)
         x = Dropout(0.5)(x)
         
-        # x = Dense(1000, activation='relu',name='dense_3')(x)
+        return x
 
-        # OUTPUT Layer
-        x = Dense(self.classes,name='dense_3')(x)
-        ouput  = Activation("softmax",name="softmax")(x)
+    def model(self):    
+        # 1st LAYER
+        x =  self.conv_layer(self.init, filters=96, kernel_size=(11,11), strides=(4,4),
+            padding="valid", max_pooling=True, activation='relu', name='conv_1')
+
+        x = BatchNormalization()(x) # apply batch normalisation.
+
+        # 2nd Layer
+        x =  self.conv_layer(x, filters=256, kernel_size=(5,5),strides=(1,1),
+            padding="same", max_pooling=True, name="conv_2")
+
+        x = BatchNormalization()(x) # apply batch normalisation.
+        
+        # 3RD LAYER
+        x =  self.conv_layer(x, filters=384, kernel_size=(3,3),strides=(1,1),
+            padding="same",max_pooling=False, name="conv_3")
+        
+
+        # 4Th LAYER
+        x =  self.conv_layer(x, filters=384, kernel_size=(3,3),strides=(1,1), 
+            padding="same", max_pooling=False, name="conv_4")
+
+        # 5Th LAYER
+        x =  self.conv_layer(x, filters=256, kernel_size=(3,3),strides=(1,1),
+            padding="same", max_pooling=True, name="conv_5")
+
+        # 6 FLATTEN 
+        x = Flatten()(x)
 
 
-        model = Model(input=self.init, output=ouput, name="alexnet")
+        # Fully Connected LAYER 1
+        x = Dense(4096)(x)
+        x = Activation('relu')(x)
+        x = Dropout(0.5)(x)
 
-        if self.weights_path:
-            # import pdb; pdb.set_trace()
-            model.load_weights(self.weights_path)
+        # FULLY CONNECTED LAYER 2
+        x = Dense(4096)(x)
+        x = Activation('relu')(x)
+        x = Dropout(0.5)(x)
+
+        # FULLY CONNECTED LAYER 3
+        output = self.output_layer(x, self.classes)
+
+        model = Model(self.init, output, name='AlexNet2')
 
         return model
-
