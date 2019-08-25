@@ -13,20 +13,20 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
-    alexnet = AlexNet(input_shape=(3, 227,227), classes=1000, weights_path='../weights/alexnet_weights.h5')
+    alexnet = AlexNet(input_shape=(3, 256,256), classes=2, weights_path='')
 
     model = alexnet.model()
 
     model.summary()
 
-    # util = ModelUtils(epochs=3)
-    # util.get_train_data()
-    # util.get_test_data()
-    # util.train(model)
-    # util.evaluate()
+    util = ModelUtils(epochs=10)
+    util.get_train_data(resize=(227, 227))
+    util.get_test_data(resize=(227,227))
+    util.train(model)
+    util.evaluate()
     # util.save()
-    # util.confusion_matrix()
-    # util.plot_loss_accuracy()
+    util.confusion_matrix()
+    util.plot_loss_accuracy()
     
     time_elapsed = datetime.now() - start 
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))

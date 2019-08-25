@@ -77,7 +77,6 @@ class GoogleNet:
 
         loss1_ave_pool = AveragePooling2D(pool_size=(5,5), strides=(3,3), name='loss1/ave_pool')(inception_4a_output)
         loss1_conv = Conv2D(128, (1,1), padding='same', activation='relu', name='loss1/conv', kernel_regularizer=l2(0.0002))(loss1_ave_pool)
-        # spp1 = SpatialPyramidPooling([1, 2, 4])(loss1_conv)
         loss1_flat = Flatten()(loss1_conv)
         loss1_fc = Dense(1024, activation='relu', name='loss1/fc', kernel_regularizer=l2(0.0002))(loss1_flat)
         loss1_drop_fc = Dropout(rate=0.7)(loss1_fc)
@@ -119,7 +118,6 @@ class GoogleNet:
 
         loss2_ave_pool = AveragePooling2D(pool_size=(5,5), strides=(3,3), name='loss2/ave_pool')(inception_4d_output)
         loss2_conv = Conv2D(128, (1,1), padding='same', activation='relu', name='loss2/conv', kernel_regularizer=l2(0.0002))(loss2_ave_pool)
-        # spp2 = SpatialPyramidPooling([1, 2, 4])(loss2_conv)
         loss2_flat = Flatten()(loss2_conv)
         loss2_fc = Dense(1024, activation='relu', name='loss2/fc', kernel_regularizer=l2(0.0002))(loss2_flat)
         loss2_drop_fc = Dropout(rate=0.7)(loss2_fc)
@@ -164,7 +162,6 @@ class GoogleNet:
         inception_5b_output = Concatenate(axis=1, name='inception_5b/output')([inception_5b_1x1,inception_5b_3x3,inception_5b_5x5,inception_5b_pool_proj])
 
         pool5_7x7_s1 = AveragePooling2D(pool_size=(7,7), strides=(1,1), name='pool5/7x7_s2')(inception_5b_output)
-        # spp3 = SpatialPyramidPooling([1, 2, 4])(pool5_7x7_s1)
         loss3_flat = Flatten()(pool5_7x7_s1)
         pool5_drop_7x7_s1 = Dropout(rate=0.4)(loss3_flat)
         loss3_classifier = Dense(self.classes, name='loss3/classifier', kernel_regularizer=l2(0.0002))(pool5_drop_7x7_s1)
@@ -175,14 +172,14 @@ class GoogleNet:
         if self.weights_path:
             googlenet.load_weights(self.weights_path)
 
-            if keras.backend.backend() == 'tensorflow':
-                # convert the convolutional kernels for tensorflow
-                ops = []
-                for layer in googlenet.layers:
-                    if layer.__class__.__name__ == 'Conv2D':
-                        original_w = K.get_value(layer.kernel)
-                        converted_w = convert_kernel(original_w)
-                        ops.append(tf.assign(layer.kernel, converted_w).op)
-                K.get_session().run(ops)
+        if keras.backend.backend() == 'tensorflow':
+            # convert the convolutional kernels for tensorflow
+            ops = []
+            for layer in googlenet.layers:
+                if layer.__class__.__name__ == 'Conv2D':
+                    original_w = K.get_value(layer.kernel)
+                    converted_w = convert_kernel(original_w)
+                    ops.append(tf.assign(layer.kernel, converted_w).op)
+            K.get_session().run(ops)
 
         return googlenet

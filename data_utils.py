@@ -62,7 +62,7 @@ def build_image_dataset_from_dir(directory,
             Y = to_categorical(Y, np.max(Y) + 1) # First class is '0'
         if shuffle_data:
             X, Y = shuffle(X, Y)
-        pickle.dump((X, Y), open(dataset_file, 'wb'), protocol=4)
+        # pickle.dump((X, Y), open(dataset_file, 'wb'), protocol=4)
     return X, Y
 
 def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
@@ -79,7 +79,7 @@ def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
             samples[i] = convert_color(samples[i],'RGB')
         samples[i] = pil_to_nparray(samples[i])
         # import pdb; pdb.set_trace()
-        samples[i] /= 255
+        # samples[i] /= 255
     print("Parsing Done!")
     return samples, targets
 

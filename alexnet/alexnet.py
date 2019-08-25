@@ -5,6 +5,7 @@ from keras.layers import Dense,Input, Dropout, Flatten, Activation, Conv2D, conc
 from keras.layers.normalization import BatchNormalization
 from keras import backend as K
 from custom_layers.lrn_layer import LRN
+from custom_layers.pool_helper import PoolHelper
 from custom_layers.crosschannelnormalisation import splittensor,crosschannelnormalization
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 K.set_image_data_format('channels_first')
@@ -20,7 +21,7 @@ class AlexNet:
         # COVOLUTIONAL LAYER 1  
         x = Conv2D(96, (11,  11),strides=(4,4),activation='relu',
                             name='conv_1')(self.init)
-
+        
         x = MaxPooling2D((3, 3), strides=(2,2))(x)
         # x = BatchNormalization(axis=3)(x)
         x = LRN(name="convpool_1")(x) # normalisation instead of Batch Normalisation
@@ -84,7 +85,7 @@ class AlexNet:
         model = Model(input=self.init, output=ouput, name="alexnet")
 
         if self.weights_path:
-            import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
             model.load_weights(self.weights_path)
 
         return model

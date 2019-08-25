@@ -1,6 +1,12 @@
 from keras.layers.core import Layer
 from keras import backend as K
-import tensorflow as tf
+if K.backend() == 'theano':
+    import theano.tensor as T
+elif K.backend() == 'tensorflow':
+    import tensorflow as tf
+else:
+    raise NotImplementedError
+
 
 class LRN(Layer):
 
