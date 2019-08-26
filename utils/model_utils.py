@@ -5,11 +5,12 @@ from keras.optimizers import SGD
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from keras.models import load_model
+from keras.preprocessing.image import ImageDataGenerator
 from data_utils import build_image_dataset_from_dir, get_labels, onehot_to_cat, plot_confusion_matrix, plot_accuracy_loss_graph
 from keras import backend as K
 
 
-FOLDER = 'turkey'
+FOLDER = 'usa'
 class ModelUtils():
 
     def __init__(self, epochs=2,test_split=0.30, validation_split=0.3):
@@ -41,10 +42,18 @@ class ModelUtils():
         self.model = model
         self.model.compile(loss='categorical_crossentropy', optimizer=self.optimizer(), 
             metrics=['accuracy'])
-
+        print("Train on {0}".format(len(self.x)))
+        print("Validate on {0}".format(len(self.valX)))
+        # aug = ImageDataGenerator(
+        #     # rescale=1./255,
+		# 	zoom_range=0.15,
+		# 	width_shift_range=0.2,
+		# 	height_shift_range=0.2,
+		# 	shear_range=0.15,
+		# 	horizontal_flip=True,
+		# 	fill_mode="nearest")
 
         if(K.image_dim_ordering() == 'th'):
-            import pdb; pdb.set_trace()
             self.x = np.moveaxis(self.x, -1, 1)
             self.valX = np.moveaxis(self.valX, -1, 1)
             self.testX = np.moveaxis(self.testX, -1, 1)
@@ -57,7 +66,7 @@ class ModelUtils():
                 self.y = [self.y,self.y, self.y] # because GoogleNet has 3 outputs
                 self.valY = [self.valY, self.valY, self.valY]
 
-            self.history = self.model.fit(self.x,self.y, 32, self.epochs, verbose=1, 
+            self.history = self.model.fit(self.x,self.y, epochs=self.epochs, verbose=1, 
                 validation_data=(self.valX, self.valY),shuffle=True)
 
         
@@ -65,7 +74,7 @@ class ModelUtils():
     def evaluate(self):
         if(self.model.name == 'googlenet'):
             self.testY = [self.testY,self.testY, self.testY] # because GoogleNet has 3 outputs
-        score = self.model.evaluate(self.testX, self.testY)
+        score = self.model.evaluate(self.x, self.y)
       
         print("%s: %.2f%%" % (self.model.metrics_names[-1], score[-1]))
 
@@ -73,7 +82,7 @@ class ModelUtils():
         self.model.save_weights(folder+'/'+self.model.name+'.h5')
 
     def optimizer(self):
-        return SGD(lr=0.01, momentum=0.9, decay=0.0005,nesterov=False)
+        return SGD(lr=0.001, momentum=0.9, decay=0.0005,nesterov=False)
 
     def confusion_matrix(self):
         predictions = self.model.predict(self.testX)

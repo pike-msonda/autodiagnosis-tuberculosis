@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     model.summary()
 
-    util = ModelUtils(epochs=10)
+    util = ModelUtils(epochs=15)
     util.get_train_data(resize=(227, 227))
     util.get_test_data(resize=(227,227))
     util.train(model)

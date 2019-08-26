@@ -19,11 +19,11 @@ def resize_images(filepath, width=256, height=256):
     resized_images = []
     images = [i for i in os.listdir(os.path.join(filepath)) if i.endswith('.png')]
     for image in images:
-        img = openCv.imread(os.path.join(filepath, image), 0)
-        imgClahe = applyClahe(img)
-        resize_image = openCv.resize(imgClahe, (IMAGE_SIZE,IMAGE_SIZE))
+        img = openCv.imread(os.path.join(filepath, image))
+        # imgClahe = applyClahe(img)
+        resize_image = openCv.resize(img, (IMAGE_SIZE,IMAGE_SIZE))
         resized_images.append(resize_image)
-    np.array(resized_images, dtype = np.uint8)
+    np.array(resized_images, dtype ="float") / 255.0
     return resized_images
 
 
@@ -41,7 +41,7 @@ def applyClahe(image):
 def rotate_images(images):
     X_rotate = []
     tf.reset_default_graph()
-    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 1))
+    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
     k = tf.placeholder(tf.int32)
     tf_img = tf.image.rot90(X, k = k)
     with tf.Session() as sess:
@@ -58,14 +58,14 @@ def rotate_images(images):
 def flip_images(X_imgs):
     X_flip = []
     tf.reset_default_graph()
-    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 1))
-    tf_img1 = tf.image.flip_left_right(X)
+    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
+    # tf_img1 = tf.image.flip_left_right(X)
     # tf_img2 = tf.image.flip_up_down(X)
     tf_img3 = tf.image.transpose_image(X)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for img in X_imgs:
-            flipped_imgs = sess.run([tf_img1,tf_img3], feed_dict = {X: img})
+            flipped_imgs = sess.run([tf_img3], feed_dict = {X: img})
             X_flip.extend(flipped_imgs)
     X_flip = np.array(X_flip, dtype = np.uint8)
     return X_flip
@@ -73,9 +73,9 @@ def flip_images(X_imgs):
 def random_crop(images, samples=2):
     x_random_crops = []
     tf.reset_default_graph()
-    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 1))
+    X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE,3))
     
-    tf_cache = tf.image.random_crop(X, [CROP_SIZE, CROP_SIZE,1], SEED)
+    tf_cache = tf.image.random_crop(X, [CROP_SIZE, CROP_SIZE,3], SEED)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for img in images:
@@ -94,21 +94,21 @@ def add_augs():
             print("Reading sub-folders in {0} ".format(subdir))
 
             images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
-            # import pdb; pdb.set_trace()
             
             print("{} will be rotated and flipped".format(len(images)))
             rotated_images = rotate_images(images)
-            cropped_images_rot = random_crop(rotated_images)
-            print("Rotated {}".format(len(cropped_images_rot)))
-            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
+            # cropped_images_rot = random_crop(rotated_images)
+            # print("Rotated {}".format(len(cropped_images_rot)))
+            # save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
 
             flipped_images = flip_images(images)
-            cropped_images_fli = random_crop(flipped_images)
-            print("Flipped  {}".format(len(flipped_images)))
+            # cropped_images_fli = random_crop(flipped_images)
+            # print("Flipped  {}".format(len(flipped_images)))
             # im = applyClahe(images)
             # print("Cropped  {}".format(len(cropped_images_fli)))
-            # import pdb; pdb.set_trace()
-            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_fli, prefix="flipped")
+            flipped_rotated =  np.concatenate((rotated_images, flipped_images))
+            cropped_images = random_crop(flipped_rotated,5)
+            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images, prefix="im")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):

@@ -8,13 +8,13 @@ from utils.model_utils import ModelUtils
 
 if __name__ == "__main__":
     start = datetime.now()
-    googlelenet = GoogleNet(input_shape=(3, 224, 224), classes=2)
+    googlelenet = GoogleNet(input_shape=(227, 227, 3), classes=2)
     model = googlelenet.model()
     model.summary()
 
-    util = ModelUtils(epochs=2)
-    util.get_train_data(resize=(224, 224))
-    util.get_test_data(resize=(224, 224))
+    util = ModelUtils(epochs=20)
+    util.get_train_data(resize=(227, 227))
+    util.get_test_data(resize=(227, 227))
     util.train(model)
     util.evaluate()
     # util.save()
