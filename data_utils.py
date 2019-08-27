@@ -95,10 +95,7 @@ def directory_to_samples(directory, flags=None, filter_channel=False):
     samples = []
     targets = []
     label = 0
-    try: # Python 2
-        classes = sorted(os.walk(directory).next()[1])
-    except Exception: # Python 3
-        classes = sorted(os.walk(directory).__next__()[1])
+    classes = sorted(os.walk(directory).__next__()[1])
     for c in classes:
         c_dir = os.path.join(directory, c)
         try: # Python 2

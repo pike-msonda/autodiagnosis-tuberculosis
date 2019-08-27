@@ -12,9 +12,9 @@ if __name__ == "__main__":
     model = googlelenet.model()
     model.summary()
 
-    util = ModelUtils(epochs=20)
+    util = ModelUtils(epochs=3)
     util.get_train_data(resize=(227, 227))
-    util.get_test_data(resize=(227, 227))
+    # util.get_test_data(resize=(227, 227))
     util.train(model)
     util.evaluate()
     # util.save()

@@ -13,7 +13,7 @@ IMAGE_PATH = ''
 SEED = 1000
 
 AUG_PATH='data' # Store the transformed image into the project folder
-IMAGE_PATH="D:\Data/train" #  Folder containing all the image to augment.
+IMAGE_PATH="E:\Pike\Data/train" #  Folder containing all the image to augment.
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
