@@ -87,7 +87,7 @@ class GoogleNet:
         # stage-6
         layer = Flatten()(layer)
         layer = Dropout(0.2)(layer)
-        layer = Dense(units=256, activation='linear')(layer)
+        layer = Dense(units=256, activation='relu')(layer)
         main = Dense(units=self.classes, activation='softmax', name='main')(layer)
         
         model = Model(inputs=self.input, outputs=[main, aux1, aux2], name="googlenet")

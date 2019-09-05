@@ -8,9 +8,10 @@ from keras.models import load_model
 from keras.preprocessing.image import ImageDataGenerator
 from data_utils import build_image_dataset_from_dir, get_labels, onehot_to_cat, plot_confusion_matrix, plot_accuracy_loss_graph
 from keras import backend as K
+from callbacks.clr_callback import CyclicLR
 
 
-FOLDER = 'all'
+FOLDER = 'turkey'
 class ModelUtils():
 
     def __init__(self, epochs=2,test_split=0.30, validation_split=0.3):
@@ -18,7 +19,7 @@ class ModelUtils():
         self.test_split=test_split
         self.validation=validation_split
         self.batch_size = 32
-
+       
 
     def get_train_data(self, name=FOLDER, folder='E:\Pike\Data/train', resize=None):
         self.x, self.y = build_image_dataset_from_dir(os.path.join(folder, name),
@@ -29,6 +30,15 @@ class ModelUtils():
             shuffle_data=True,
             categorical_Y=True)
         self.x, self.valX, self.y, self.valY = train_test_split(self.x, self.y, test_size=self.test_split, random_state=1000)
+        mean = np.mean(self.x, axis=0)
+        self.x -= mean
+        self.valX -= mean
+        # self.clr = CyclicLR(
+        #     mode="triangular",
+        #     base_lr=1e-7,
+        #     max_lr=1e-2,
+        #     step_size= 8 * (self.x.shape[0] // self.batch_size))
+
 
     def get_test_data(self, name=FOLDER, folder='E:\Pike\Data/test', resize=None):
         self.testX, self.testY = build_image_dataset_from_dir(os.path.join(folder, name),
@@ -50,6 +60,7 @@ class ModelUtils():
 			height_shift_range=0.2,
 			shear_range=0.15,
 			horizontal_flip=True,
+            # vertical_flip=True,
 			fill_mode="nearest")
 
         if(K.image_dim_ordering() == 'th'):
@@ -64,10 +75,12 @@ class ModelUtils():
             if(self.model.name == 'googlenet'):
                 self.y = [self.y,self.y, self.y] # because GoogleNet has 3 outputs
                 self.valY = [self.valY, self.valY, self.valY]
-            import pdb; pdb.set_trace()
+
             self.history = self.model.fit_generator(aug.flow(self.x,self.y, batch_size=self.batch_size, shuffle=True),
                 steps_per_epoch=len(self.x)/self.batch_size ,epochs=self.epochs, verbose=1, 
-                validation_data=(self.valX, self.valY))
+                validation_data=(self.valX, self.valY)
+                # callbacks=[self.clr]
+                )
 
         
 
@@ -82,7 +95,7 @@ class ModelUtils():
         self.model.save_weights(folder+'/'+self.model.name+'.h5')
 
     def optimizer(self):
-        return SGD(lr=0.01, momentum=0.9, decay=0.0005,nesterov=False)
+        return SGD(lr=0.001 , momentum=0.9, decay=0.0005,nesterov=False)
 
     def confusion_matrix(self):
         predictions = self.model.predict(self.valX)

@@ -13,7 +13,7 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
-    resnet50 = ResNet50(input_shape=(224,224,3), classes=2)
+    resnet50 = ResNet50(input_shape=(227,227,3), classes=2)
 
     model = resnet50.model()
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     util.get_test_data()
     util.train(model)
     util.evaluate()
-    util.save()
+    # util.save()
     util.confusion_matrix()
     
     time_elapsed = datetime.now() - start 

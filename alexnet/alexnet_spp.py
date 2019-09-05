@@ -69,7 +69,7 @@ class AlexNet:
             padding="same", max_pooling=True, name="conv_5")
 
         # 6 FLATTEN 
-        x = SpatialPyramidPooling([1,2,3,4,5])
+        x = SpatialPyramidPooling([1,3,5])(x)
         # x = Flatten()(x)
 
 

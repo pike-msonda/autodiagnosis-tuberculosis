@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..") 
 from data_utils import *
-from alexnet_spp import AlexNetSPP
+from alexnet_spp import AlexNet
 from datetime import datetime
 from utils.model_utils import ModelUtils
 
@@ -13,18 +13,18 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
-    alexnet = AlexNetSPP(input_shape=(3,None,None), classes=2)
+    alexnet = AlexNet(input_shape=(None,None, 3), classes=2)
 
     model = alexnet.model()
 
-    # model.summary()
+    model.summary()
 
-    util = ModelUtils(epochs=20)
-    util.get_train_data()
-    util.get_test_data()
+    util = ModelUtils(epochs=40)
+    util.get_train_data(resize=(256, 256))
+    # util.get_test_data()
     util.train(model)
     util.evaluate()
-    util.save()
+    # util.save()
     util.confusion_matrix()
     util.plot_loss_accuracy()
     

@@ -23,7 +23,7 @@ class AlexNet:
             activation="relu", name=None): 
 
         x = Conv2D(filters, kernel_size, strides=strides, padding=padding, 
-            activation=activation)(x)
+            activation=activation,kernel_regularizer=kernel_regularizer)(x)
         if (max_pooling):
             x = MaxPooling2D(pool_size=(3,3), strides=(2,2))(x)
  
@@ -44,7 +44,7 @@ class AlexNet:
     def model(self):    
         # 1st LAYER
         x =  self.conv_layer(self.init, filters=96, kernel_size=(11,11), strides=(4,4),
-            padding="valid", max_pooling=True, activation='relu', name='conv_1')
+            padding="same", max_pooling=True, activation='relu', name='conv_1')
 
         x = BatchNormalization()(x) # apply batch normalisation.
 
