@@ -30,7 +30,7 @@ class AlexNet:
         return x
 
     def output_layer(self,x, classes):
-        x = Dense(units=classes)(x)
+        x = Dense(units=classes,  kernel_regularizer=l2(0))(x)
         x = Activation('softmax')(x)
         return x
     
@@ -46,13 +46,13 @@ class AlexNet:
         x =  self.conv_layer(self.init, filters=96, kernel_size=(11,11), strides=(4,4),
             padding="same", max_pooling=True, activation='relu', name='conv_1')
 
-        x = BatchNormalization()(x) # apply batch normalisation.
+        x = BatchNormalization(axis=-1)(x) # apply batch normalisation.
 
         # 2nd Layer
         x =  self.conv_layer(x, filters=256, kernel_size=(5,5),strides=(1,1),
             padding="same", max_pooling=True, name="conv_2")
 
-        x = BatchNormalization()(x) # apply batch normalisation.
+        x = BatchNormalization(axis=-1)(x) # apply batch normalisation.
         
         # 3RD LAYER
         x =  self.conv_layer(x, filters=384, kernel_size=(3,3),strides=(1,1),
@@ -72,17 +72,17 @@ class AlexNet:
 
 
         # Fully Connected LAYER 1
-        x = Dense(4096)(x)
+        x = Dense(4096,  kernel_regularizer=l2(0))(x)
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
 
         # FULLY CONNECTED LAYER 2
-        x = Dense(4096)(x)
+        x = Dense(4096,  kernel_regularizer=l2(0))(x)
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
 
         # FULLY CONNECTED LAYER 3
-        x = Dense(1000)(x)
+        x = Dense(1000,  kernel_regularizer=l2(0))(x)
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
         

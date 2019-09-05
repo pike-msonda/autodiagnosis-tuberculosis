@@ -95,20 +95,20 @@ def add_augs():
 
             images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
             
-            print("{} will be rotated and flipped".format(len(images)))
-            rotated_images = rotate_images(images)
+            # print("{} will be rotated and flipped".format(len(images)))
+            # rotated_images = rotate_images(images)
             # cropped_images_rot = random_crop(rotated_images)
             # print("Rotated {}".format(len(cropped_images_rot)))
             # save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
 
-            flipped_images = flip_images(images)
+            # flipped_images = flip_images(images)
             # cropped_images_fli = random_crop(flipped_images)
             # print("Flipped  {}".format(len(flipped_images)))
             # im = applyClahe(images)
             # print("Cropped  {}".format(len(cropped_images_fli)))
-            flipped_rotated =  np.concatenate((rotated_images, flipped_images))
-            cropped_images = random_crop(flipped_rotated,5)
-            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images, prefix="im")
+            # flipped_rotated =  np.concatenate((rotated_images, flipped_images))
+            # cropped_images = random_crop(flipped_rotated,5)
+            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=images, prefix="im")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):

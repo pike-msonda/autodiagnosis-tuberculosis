@@ -12,6 +12,8 @@ from urllib import request
 from io import BytesIO
 import matplotlib.pyplot as plt
 import itertools
+import random
+random.seed(1000)
 np.random.seed(1000)
 _EPSILON = 1e-8
 
@@ -32,7 +34,8 @@ def to_categorical(y, nb_classes=None):
 
 def load_image(in_image):
     # load image
-    img = Image.open(in_image)
+    # img = Image.open(in_image)
+    img = cv2.imread(in_image)
     return img
 
 def resize_image(in_image, new_width, new_height, out_image=None,
@@ -77,9 +80,8 @@ def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
             samples[i] = resize_image(samples[i], resize[0], resize[1])
         if convert_to_color:
             samples[i] = convert_color(samples[i],'RGB')
-        samples[i] = pil_to_nparray(samples[i])
-        # import pdb; pdb.set_trace()
-        samples[i] /= 255
+        # samples[i] = pil_to_nparray(samples[i])
+        # samples[i] /= 255
     print("Parsing Done!")
     return samples, targets
 

@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     util = ModelUtils(epochs=40)
     util.get_train_data()
-    util.get_test_data()
+    # util.get_test_data()
     util.train(model)
     util.evaluate()
     # util.save()
