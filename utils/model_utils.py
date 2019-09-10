@@ -10,13 +10,16 @@ from data_utils import build_image_dataset_from_dir, get_labels, onehot_to_cat, 
 from keras import backend as K
 from utils.data_sequence import DataSequence
 from utils.augs import AUGMENTATIONS_TRAIN, AUGMENTATIONS_TEST
+import tensorflow as tf
 import random
+tf.set_random_seed(1000)
 random.seed(1000)
 np.random.seed(1000)
-FOLDER = 'all'
+
+FOLDER = 'turkey'
 class ModelUtils():
 
-    def __init__(self, epochs=2,test_split=0.20, validation_split=0.3):
+    def __init__(self, epochs=2,test_split=0.20, validation_split=0.30):
         self.epochs=epochs
         self.test_split=test_split
         self.validation=validation_split
@@ -31,10 +34,14 @@ class ModelUtils():
             convert_to_color=False,
             shuffle_data=True,
             categorical_Y=True)
-        self.x, self.valX, self.y, self.valY = train_test_split(self.x, self.y, test_size=self.test_split, random_state=1000)
-        self.trainGen =  DataSequence(self.x, self.y, self.batch_size, AUGMENTATIONS_TRAIN)
-        self.valGen =  DataSequence(self.valX, self.valY, self.batch_size, AUGMENTATIONS_TEST)
-        # import pdb; pdb.set_trace()
+        self.trainX, self.valX, self.trainY, self.valY = train_test_split(self.x, self.y, test_size=self.validation, random_state=1000)
+        self.trainX, self.testX, self.trainY, self.testY = train_test_split(self.trainX, self.trainY, test_size=self.test_split, random_state=1000)
+        print("Training on {0} and validating on {1}".format(len(self.trainX), len(self.valX)))
+        print("Testing on {0}".format(len(self.testX)))
+
+        self.trainGen =  DataSequence(self.trainX, self.trainY, self.batch_size, AUGMENTATIONS_TRAIN)
+        self.valGen =  DataSequence(self.valX, self.valY, self.batch_size, AUGMENTATIONS_TRAIN)
+        self.testGen =  DataSequence(self.testX, self.testY, self.batch_size, AUGMENTATIONS_TEST)
 
     def get_test_data(self, name=FOLDER, folder='E:\Pike\Data/test', resize=None):
         self.testX, self.testY = build_image_dataset_from_dir(os.path.join(folder, name),
@@ -59,22 +66,21 @@ class ModelUtils():
         #     # vertical_flip=True,
 		# 	fill_mode="nearest")
 
-        if(K.image_dim_ordering() == 'th'):
-            self.x = np.moveaxis(self.x, -1, 1)
-            self.valX = np.moveaxis(self.valX, -1, 1)
-            self.testX = np.moveaxis(self.testX, -1, 1)
+        # if(K.image_dim_ordering() == 'th'):
+        #     self.x = np.moveaxis(self.x, -1, 1)
+        #     self.valX = np.moveaxis(self.valX, -1, 1)
+        #     self.testX = np.moveaxis(self.testX, -1, 1)
         
-        if(os.path.exists('../models/'+self.model.name+'.h5')):
-            self.model.load_weights('../models/'+self.model.name+'.h5') 
-            self.model.evaluate(self.valX, self.valY, verbose=0)
-        else:
-            if(self.model.name == 'googlenet'):
-                self.y = [self.y,self.y, self.y] # because GoogleNet has 3 outputs
-                self.valY = [self.valY, self.valY, self.valY]
-
-            self.history = self.model.fit_generator(self.trainGen,
-                epochs=self.epochs, verbose=1, shuffle=True,
-                validation_data=self.valGen, workers=2, use_multiprocessing=False)
+        # if(os.path.exists('../models/'+self.model.name+'.h5')):
+        #     self.model.load_weights('../models/'+self.model.name+'.h5') 
+        #     self.model.evaluate(self.valX, self.valY, verbose=0)
+        # else:
+        #     if(self.model.name == 'googlenet'):
+        #         self.y = [self.y,self.y, self.y] # because GoogleNet has 3 outputs
+        #         self.valY = [self.valY, self.valY, self.valY]
+        self.history = self.model.fit_generator(self.trainGen,
+            epochs=self.epochs, verbose=1, shuffle=True,
+            validation_data=self.valGen, workers=2, use_multiprocessing=False)
 
             # self.history = self.model.fit_generator(aug.flow(self.x,self.y, batch_size=self.batch_size, shuffle=True),
             #     steps_per_epoch=len(self.x)/self.batch_size ,epochs=self.epochs, verbose=1, 
@@ -85,7 +91,7 @@ class ModelUtils():
     def evaluate(self):
         if(self.model.name == 'googlenet'):
             self.testY = [self.testY,self.testY, self.testY] # because GoogleNet has 3 outputs
-        score = self.model.evaluate_generator(self.valGen)
+        score = self.model.evaluate_generator(self.testGen)
       
         print("%s: %.2f%%" % (self.model.metrics_names[-1], score[-1]))
 
@@ -93,7 +99,7 @@ class ModelUtils():
         self.model.save_weights(folder+'/'+self.model.name+'.h5')
 
     def optimizer(self):
-        return SGD(lr=0.001, momentum=0.9, decay=0.0005,nesterov=False)
+        return SGD(lr=0.001, momentum=0.99, decay=0.0005,nesterov=False)
 
     def confusion_matrix(self):
         predictions = self.model.predict_generator(self.valGen)

@@ -13,7 +13,7 @@ IMAGE_PATH = ''
 SEED = 1000
 
 AUG_PATH='data' # Store the transformed image into the project folder
-IMAGE_PATH="E:\Pike\Data/train" #  Folder containing all the image to augment.
+IMAGE_PATH="D:\Data/train" #  Folder containing all the image to augment.
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
@@ -95,20 +95,14 @@ def add_augs():
 
             images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
             
-            # print("{} will be rotated and flipped".format(len(images)))
-            # rotated_images = rotate_images(images)
-            # cropped_images_rot = random_crop(rotated_images)
-            # print("Rotated {}".format(len(cropped_images_rot)))
-            # save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped_images_rot, prefix="rotated")
-
-            # flipped_images = flip_images(images)
-            # cropped_images_fli = random_crop(flipped_images)
-            # print("Flipped  {}".format(len(flipped_images)))
-            # im = applyClahe(images)
-            # print("Cropped  {}".format(len(cropped_images_fli)))
-            # flipped_rotated =  np.concatenate((rotated_images, flipped_images))
-            # cropped_images = random_crop(flipped_rotated,5)
-            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=images, prefix="im")
+            print("{0} Resized to ({1}, {2}".format(len(images), IMAGE_SIZE, IMAGE_SIZE))
+            cropped = random_crop(images, 5)
+            print("Cropped {}".format(len(cropped)))
+            
+            # aug_images =  np.concatenate((cropped, images))
+            # print("Total auged images {}".format(len(aug_images)))
+            
+            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped, prefix="im")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):

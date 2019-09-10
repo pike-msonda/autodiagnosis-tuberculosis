@@ -1,5 +1,10 @@
 from keras.utils import Sequence
+import tensorflow as tf
 import numpy as np
+import random
+tf.set_random_seed(1000)
+np.random.seed(1000)
+random.seed(1000)
 class DataSequence(Sequence):
     def __init__(self, x_set, y_set, batch_size, augmentations):
         self.x, self.y = x_set, y_set
