@@ -13,7 +13,7 @@ IMAGE_PATH = ''
 SEED = 1000
 
 AUG_PATH='data' # Store the transformed image into the project folder
-IMAGE_PATH="D:\Data/train" #  Folder containing all the image to augment.
+IMAGE_PATH="E:\Pike\Data/train" #  Folder containing all the image to augment.
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
@@ -96,7 +96,7 @@ def add_augs():
             images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
             
             print("{0} Resized to ({1}, {2}".format(len(images), IMAGE_SIZE, IMAGE_SIZE))
-            cropped = random_crop(images, 5)
+            cropped = random_crop(images, 7)
             print("Cropped {}".format(len(cropped)))
             
             # aug_images =  np.concatenate((cropped, images))

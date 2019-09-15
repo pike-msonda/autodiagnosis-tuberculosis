@@ -22,14 +22,14 @@ if __name__ == "__main__":
 
     # model.summary()
 
-    util = ModelUtils(epochs=20)
+    util = ModelUtils(epochs=200)
     util.get_train_data()
     # util.get_test_data(resize=(227,227))
     util.train(model)
     util.evaluate()
-    # util.save()
-    # util.confusion_matrix()
-    # util.plot_loss_accuracy()
+    util.save()
+    util.confusion_matrix()
+    util.plot_loss_accuracy()
     
     time_elapsed = datetime.now() - start 
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
