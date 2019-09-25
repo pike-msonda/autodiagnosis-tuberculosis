@@ -15,7 +15,6 @@ if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
     model = ResNet50(include_top=True, input_shape=(227,227,3), weights=None,  classes=2)
-
     # model = resnet50.model()
 
     model.summary()

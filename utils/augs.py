@@ -4,7 +4,7 @@ random.seed(1000)
 from albumentations import (
     Compose, HorizontalFlip, CLAHE, HueSaturationValue,
     RandomBrightness, RandomContrast, RandomGamma,RandomRotate90,VerticalFlip,
-    ToFloat, ShiftScaleRotate
+    ToFloat, ShiftScaleRotate, GaussianBlur
 )
 
 AUGMENTATIONS_TRAIN = Compose([
