@@ -2,7 +2,6 @@ import sys
 sys.path.append("..") 
 from data_utils import *
 from datetime import datetime
-from googlenet import InceptionV1
 from utils.model_utils import ModelUtils
 
 
