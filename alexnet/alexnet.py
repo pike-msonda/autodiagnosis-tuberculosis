@@ -10,7 +10,12 @@ from keras.layers.convolutional import MaxPooling2D, AveragePooling2D, ZeroPaddi
 from keras.layers.normalization import BatchNormalization
 from keras.models import Model
 from keras.regularizers import l2
-
+import tensorflow as tf
+import numpy as np
+import random
+tf.set_random_seed(1000)
+np.random.seed(1000)
+random.seed(1000)
 class AlexNet:
 
     def __init__(self, input_shape, classes, weights_path=''):
@@ -44,15 +49,16 @@ class AlexNet:
     def model(self):    
         # 1st LAYER
         x =  self.conv_layer(self.init, filters=96, kernel_size=(11,11), strides=(4,4),
-            padding="same", max_pooling=True, activation='relu', name='conv_1')
+            padding="valid", max_pooling=True, activation='relu', name='conv_1')
 
-        x = BatchNormalization(axis=-1)(x) # apply batch normalisation.
+        x =  ZeroPadding2D((1,1))(x)
+        x = BatchNormalization()(x) # apply batch normalisation.
 
         # 2nd Layer
         x =  self.conv_layer(x, filters=256, kernel_size=(5,5),strides=(1,1),
             padding="same", max_pooling=True, name="conv_2")
 
-        x = BatchNormalization(axis=-1)(x) # apply batch normalisation.
+        x = BatchNormalization()(x) # apply batch normalisation.
         
         # 3RD LAYER
         x =  self.conv_layer(x, filters=384, kernel_size=(3,3),strides=(1,1),
@@ -81,11 +87,6 @@ class AlexNet:
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
 
-        # FULLY CONNECTED LAYER 3
-        x = Dense(1000,  kernel_regularizer=l2(0))(x)
-        x = Activation('relu')(x)
-        x = Dropout(0.5)(x)
-        
         # Ouput Layer. Set class 
         output = self.output_layer(x, self.classes)
 

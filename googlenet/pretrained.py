@@ -1,12 +1,12 @@
+
 import sys
 sys.path.append("..") 
 from data_utils import *
 from datetime import datetime
 from keras.models import Model
-from keras.applications import ResNet50
+from keras.applications.inception_v3 import InceptionV3
 from keras.layers import GlobalAveragePooling2D, Dense
 from utils.model_utils import ModelUtils
-from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 
 DATASET_PATH = '../data/train/'
 TEST_PATH = 'D:\Data/test/'
@@ -16,9 +16,9 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 
 def make_model(classes=2):
      # CREATE MODEL 
-    model = ResNet50(include_top=False, weights=None)
+    model = InceptionV3(include_top=False, weights='imagenet')
     x = model.output
-    x = SpatialPyramidPooling([1,3,5])(x)
+    x = GlobalAveragePooling2D()(x)
     x = Dense(1024, activation='relu')(x)
     predictions = Dense(classes, activation='softmax')(x)
     model = Model(inputs=model.input, outputs=predictions)

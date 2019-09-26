@@ -19,7 +19,7 @@ np.random.seed(1000)
 FOLDER = 'all'
 class ModelUtils():
 
-    def __init__(self, epochs=2,test_split=0.20, validation_split=0.30):
+    def __init__(self, epochs=2,test_split=0.20, validation_split=0.20):
         self.epochs=epochs
         self.test_split=test_split
         self.validation=validation_split
@@ -37,13 +37,12 @@ class ModelUtils():
 
         self.trainX, self.valX, self.trainY, self.valY = train_test_split(self.x, self.y, test_size=self.validation, random_state=1000)
 
-        self.trainX, self.testX, self.trainY, self.testY = train_test_split(self.trainX, self.trainY, test_size=self.test_split, random_state=1000)
+        # self.trainX, self.testX, self.trainY, self.testY = train_test_split(self.trainX, self.trainY, test_size=self.test_split, random_state=1000)
         print("Training on {0} and validating on {1}".format(len(self.trainX), len(self.valX)))
-        print("Testing on {0}".format(len(self.testX)))
 
         self.trainGen =  DataSequence(self.trainX, self.trainY, self.batch_size, AUGMENTATIONS_TRAIN)
         self.valGen =  DataSequence(self.valX, self.valY, self.batch_size, AUGMENTATIONS_TEST)
-        self.testGen =  DataSequence(self.testX, self.testY, self.batch_size, AUGMENTATIONS_TEST)
+        # self.valGen =  DataSequence(self.testX, self.testY, self.batch_size, AUGMENTATIONS_TEST)
 
     def get_test_data(self, name=FOLDER, folder='E:\Pike\Data/test', resize=None):
         self.testX, self.testY = build_image_dataset_from_dir(os.path.join(folder, name),
@@ -62,31 +61,17 @@ class ModelUtils():
         if(K.image_dim_ordering() == 'th'):
             self.x = np.moveaxis(self.x, -1, 1)
             self.valX = np.moveaxis(self.valX, -1, 1)
-            self.testX = np.moveaxis(self.testX, -1, 1)
         
         if(os.path.exists('../models/'+self.model.name+'.h5')):
             self.model.load_weights('../models/'+self.model.name+'.h5') 
-            # self.model.evaluate_generator(self.testGen)
         else:
-            # if(self.model.name == 'googlenet'):
-            #     self.y = [self.y,self.y, self.y] # because GoogleNet has 3 outputs
-            #     self.valY = [self.valY, self.valY, self.valY]
-
             self.history = self.model.fit_generator(self.trainGen,
                 epochs=self.epochs, verbose=1, shuffle=True,
                 validation_data=self.valGen, workers=2, use_multiprocessing=False)
 
-            # self.history = self.model.fit_generator(aug.flow(self.x,self.y, batch_size=self.batch_size, shuffle=True),
-            #     steps_per_epoch=len(self.x)/self.batch_size ,epochs=self.epochs, verbose=1, 
-            #     validation_data=(self.valX, self.valY))
-
-        
-
     def evaluate(self):
-        # if(self.model.name == 'googlenet'):
-        #     self.testY = [self.testY,self.testY, self.testY] # because GoogleNet has 3 outputs
-        score = self.model.evaluate_generator(self.testGen)
-        # scoreVal = self.model.evaluate_generator(self.valGen)
+        
+        score = self.model.evaluate_generator(self.valGen)
       
         print(score)
         print("%s: %.2f%%" % (self.model.metrics_names[-1], score[-1]))
@@ -98,13 +83,9 @@ class ModelUtils():
         return SGD(lr=0.001, momentum=0.9, decay=0.0005)
 
     def confusion_matrix(self):
-        predictions = self.model.predict_generator(self.testGen)
-        # if(self.model.name == 'googlenet'):
-        #     self.testY = self.testY[0]
-        #     predictions = predictions[0]
-
-        labels = list(set(get_labels(self.testY))) 
-        cm = confusion_matrix(get_labels(self.testY),get_labels(predictions))
+        predictions = self.model.predict_generator(self.valGen)
+        labels = list(set(get_labels(self.valY))) 
+        cm = confusion_matrix(get_labels(self.valY),get_labels(predictions))
         print("Confusion Matrix {}".format(cm))
         plot_confusion_matrix(cm, labels, title=self.model.name)
 

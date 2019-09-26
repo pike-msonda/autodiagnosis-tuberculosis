@@ -9,14 +9,11 @@ DATASET_PATH = '../data/train/'
 TEST_PATH = 'D:\Data/test/'
 TEST_PATH_NAME=os.path.join(TEST_PATH, 'china.pkl')
 IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
-import random
-random.seed(1000)
-import numpy as np
-np.random.seed(1000)
+
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
-    alexnet = AlexNet(input_shape=(227,227, 3), classes=2, weights_path='')
+    alexnet = AlexNet(input_shape=(227,227, 3), classes=2)
 
     model = alexnet.model()
 
@@ -24,7 +21,7 @@ if __name__ == "__main__":
 
     util = ModelUtils(epochs=200)
     util.get_train_data()
-    # util.get_test_data(resize=(227,227))
+    # util.get_test_data()
     util.train(model)
     util.evaluate()
     util.save()

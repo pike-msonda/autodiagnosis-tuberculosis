@@ -2,8 +2,9 @@ import sys
 sys.path.append("..") 
 from data_utils import *
 from datetime import datetime
+from keras.models import Model
 from keras.applications import ResNet50
-from keras.models import GlobalAveragePooling2D, Model, Dense
+from keras.layers import GlobalAveragePooling2D, Dense
 from utils.model_utils import ModelUtils
 
 DATASET_PATH = '../data/train/'
@@ -27,14 +28,14 @@ if __name__ == "__main__":
     start = datetime.now()
     model  = make_model()
 
-    # util = ModelUtils(epochs=200)
-    # util.get_train_data()
-    # # util.get_test_data(resize=(227,227))
-    # util.train(model)
-    # util.evaluate()
-    # util.save()
-    # util.confusion_matrix()
-    # util.plot_loss_accuracy()
+    model.summary()
+    util = ModelUtils(epochs=200)
+    util.get_train_data()
+    util.train(model)
+    util.evaluate()
+    util.save()
+    util.confusion_matrix()
+    util.plot_loss_accuracy()
     
-    # time_elapsed = datetime.now() - start 
-    # print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
+    time_elapsed = datetime.now() - start 
+    print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))

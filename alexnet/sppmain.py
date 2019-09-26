@@ -17,14 +17,12 @@ if __name__ == "__main__":
 
     model = alexnet.model()
 
-    model.summary()
-
-    util = ModelUtils(epochs=40)
-    util.get_train_data(resize=(256, 256))
+    util = ModelUtils(epochs=200)
+    util.get_train_data()
     # util.get_test_data()
     util.train(model)
     util.evaluate()
-    # util.save()
+    util.save()
     util.confusion_matrix()
     util.plot_loss_accuracy()
     

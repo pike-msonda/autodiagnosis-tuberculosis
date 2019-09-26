@@ -11,7 +11,12 @@ from keras.layers.normalization import BatchNormalization
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 from keras.models import Model
 from keras.regularizers import l2
-
+import tensorflow as tf
+import numpy as np
+import random
+tf.set_random_seed(1000)
+np.random.seed(1000)
+random.seed(1000)
 class AlexNet:
 
     def __init__(self, input_shape, classes, weights_path=''):
@@ -47,6 +52,7 @@ class AlexNet:
         x =  self.conv_layer(self.init, filters=96, kernel_size=(11,11), strides=(4,4),
             padding="valid", max_pooling=True, activation='relu', name='conv_1')
 
+        x =  ZeroPadding2D((1,1))(x)
         x = BatchNormalization()(x) # apply batch normalisation.
 
         # 2nd Layer
@@ -80,11 +86,6 @@ class AlexNet:
 
         # FULLY CONNECTED LAYER 2
         x = Dense(4096)(x)
-        x = Activation('relu')(x)
-        x = Dropout(0.5)(x)
-
-        # FULLY CONNECTED LAYER 3
-        x = Dense(1000)(x)
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
         
