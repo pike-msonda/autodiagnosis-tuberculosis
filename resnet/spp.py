@@ -4,7 +4,7 @@ from data_utils import *
 from datetime import datetime
 from keras.models import Model
 from keras.applications import ResNet50
-from keras.layers import GlobalAveragePooling2D, Dense
+from keras.layers import GlobalAveragePooling2D, Dense, GlobalMaxPooling2D
 from utils.model_utils import ModelUtils
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 
@@ -16,12 +16,12 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 
 def make_model(classes=2):
      # CREATE MODEL 
-    model = ResNet50(include_top=False, weights=None)
+    model = ResNet50(include_top=False, input_shape=(None, None, 3), weights=None)
     x = model.output
-    x = SpatialPyramidPooling([1,3,5])(x)
-    x = Dense(1024, activation='relu')(x)
+    x = GlobalMaxPooling2D()(x)
+    x = SpatialPyramidPooling([1,2,3,4])(x)
     predictions = Dense(classes, activation='softmax')(x)
-    model = Model(inputs=model.input, outputs=predictions)
+    model = Model(inputs=model.input, outputs=predictions, name='resnet50_spp')
     return model
 
     
@@ -30,8 +30,9 @@ if __name__ == "__main__":
     model  = make_model()
 
     model.summary()
-    util = ModelUtils(epochs=200)
+    util = ModelUtils(epochs=80)
     util.get_train_data()
+    util.get_test_data()
     util.train(model)
     util.evaluate()
     util.save()

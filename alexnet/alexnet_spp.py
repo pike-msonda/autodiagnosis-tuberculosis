@@ -48,12 +48,12 @@ class AlexNet:
         return x
 
     def model(self):    
-        # 1st LAYER
+          # 1st LAYER
         x =  self.conv_layer(self.init, filters=96, kernel_size=(11,11), strides=(4,4),
             padding="valid", max_pooling=True, activation='relu', name='conv_1')
 
-        x =  ZeroPadding2D((1,1))(x)
         x = BatchNormalization()(x) # apply batch normalisation.
+        x =  ZeroPadding2D((1,1))(x)
 
         # 2nd Layer
         x =  self.conv_layer(x, filters=256, kernel_size=(5,5),strides=(1,1),
@@ -64,34 +64,44 @@ class AlexNet:
         # 3RD LAYER
         x =  self.conv_layer(x, filters=384, kernel_size=(3,3),strides=(1,1),
             padding="same",max_pooling=False, name="conv_3")
-        
+
+        x = BatchNormalization()(x) # apply batch normalisation.
+
 
         # 4Th LAYER
         x =  self.conv_layer(x, filters=384, kernel_size=(3,3),strides=(1,1), 
             padding="same", max_pooling=False, name="conv_4")
+        x = BatchNormalization()(x) # apply batch normalisation.
+
 
         # 5Th LAYER
         x =  self.conv_layer(x, filters=256, kernel_size=(3,3),strides=(1,1),
             padding="same", max_pooling=True, name="conv_5")
+        x = BatchNormalization()(x) # apply batch normalisation.
 
         # 6 FLATTEN 
-        x = SpatialPyramidPooling([1,3,5])(x)
+        x = SpatialPyramidPooling([1,2,3,4])(x)
         # x = Flatten()(x)
 
 
         # Fully Connected LAYER 1
-        x = Dense(4096)(x)
+        x = Dense(4096,  kernel_regularizer=l2(0))(x)
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
 
         # FULLY CONNECTED LAYER 2
-        x = Dense(4096)(x)
+        x = Dense(4096,  kernel_regularizer=l2(0))(x)
         x = Activation('relu')(x)
         x = Dropout(0.5)(x)
-        
+
+        # FULLY CONNECTED LAYER 2
+        x = Dense(1000,  kernel_regularizer=l2(0))(x)
+        x = Activation('relu')(x)
+        x = Dropout(0.5)(x)
+
         # Ouput Layer. Set class 
         output = self.output_layer(x, self.classes)
 
-        model = Model(self.init, output, name='AlexNet')
+        model = Model(self.init, output, name='alexnet_spp')
 
         return model

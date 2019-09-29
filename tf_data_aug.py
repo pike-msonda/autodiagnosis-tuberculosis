@@ -96,13 +96,17 @@ def add_augs():
             images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
             
             print("{0} Resized to ({1}, {2}".format(len(images), IMAGE_SIZE, IMAGE_SIZE))
-            cropped = random_crop(images, 7)
-            print("Cropped {}".format(len(cropped)))
+
+            rotated_images=rotate_images(images)
+            print("{0} Images Rotated".format(len(rotated_images)))
+
+            # cropped = random_crop(rotated_images,4)
+            # print("Cropped {}".format(len(cropped)))
             
-            # aug_images =  np.concatenate((cropped, images))
+            # aug_images =  np.concatenate((cropped, rotated_images))
             # print("Total auged images {}".format(len(aug_images)))
             
-            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=cropped, prefix="im")
+            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=rotated_images, prefix="im")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):

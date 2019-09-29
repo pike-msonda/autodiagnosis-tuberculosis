@@ -1,19 +1,20 @@
 import sys
 sys.path.append("..") 
 from data_utils import *
+from keras.applications.inception_v3 import InceptionV3
 from datetime import datetime
 from utils.model_utils import ModelUtils
 
 
 if __name__ == "__main__":
     start = datetime.now()
-    model = InceptionV1(input_shape=(227, 227, 3), classes=2)
+    model = InceptionV3( include_top=True, input_shape=(256, 256, 3), weights=None, classes=2)
     # model = googlelenet.model()
     model.summary()
 
-    util = ModelUtils(epochs=200)
+    util = ModelUtils(epochs=80)
     util.get_train_data()
-    # util.get_test_data(resize=(227,227))
+    util.get_test_data()
     util.train(model)
     util.evaluate()
     util.save()

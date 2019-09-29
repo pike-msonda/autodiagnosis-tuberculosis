@@ -16,10 +16,11 @@ if __name__ == "__main__":
     alexnet = AlexNet(input_shape=(None,None, 3), classes=2)
 
     model = alexnet.model()
+    model.summary()
 
-    util = ModelUtils(epochs=200)
+    util = ModelUtils(epochs=80)
     util.get_train_data()
-    # util.get_test_data()
+    util.get_test_data()
     util.train(model)
     util.evaluate()
     util.save()

@@ -12,7 +12,7 @@ TEST_PATH = 'D:\Data/test/'
 TEST_PATH_NAME=os.path.join(TEST_PATH, 'china.pkl')
 IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 
-
+MODEL_SIZE=(224, 224)
 def make_model(classes=2):
      # CREATE MODEL 
     model = ResNet50(include_top=False, weights='imagenet')
@@ -20,7 +20,7 @@ def make_model(classes=2):
     x = GlobalAveragePooling2D()(x)
     x = Dense(1024, activation='relu')(x)
     predictions = Dense(classes, activation='softmax')(x)
-    model = Model(inputs=model.input, outputs=predictions)
+    model = Model(inputs=model.input, outputs=predictions, name="resent_pretrained")
     return model
 
     
@@ -28,9 +28,10 @@ if __name__ == "__main__":
     start = datetime.now()
     model  = make_model()
 
-    model.summary()
-    util = ModelUtils(epochs=200)
-    util.get_train_data()
+    # model.summary()
+    util = ModelUtils(epochs=80)
+    util.get_train_data(resize=MODEL_SIZE)
+    util.get_test_data(resize=MODEL_SIZE)
     util.train(model)
     util.evaluate()
     util.save()

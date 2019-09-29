@@ -16,12 +16,11 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 
 def make_model(classes=2):
      # CREATE MODEL 
-    model = ResNet50(include_top=False, weights='imagenet')
+    model = ResNet50(include_top=False, input_shape=(None, None, 3), weights='imagenet')
     x = model.output
-    x = SpatialPyramidPooling([1,3,5])(x)
-    x = Dense(1024, activation='relu')(x)
+    x = SpatialPyramidPooling([1,2,3,4])(x)
     predictions = Dense(classes, activation='softmax')(x)
-    model = Model(inputs=model.input, outputs=predictions)
+    model = Model(inputs=model.input, outputs=predictions, name='resnet50spp_pretrained')
     return model
 
     
@@ -30,8 +29,9 @@ if __name__ == "__main__":
     model  = make_model()
 
     model.summary()
-    util = ModelUtils(epochs=200)
+    util = ModelUtils(epochs=80)
     util.get_train_data()
+    util.get_test_data()
     util.train(model)
     util.evaluate()
     util.save()
