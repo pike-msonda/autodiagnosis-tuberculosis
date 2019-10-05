@@ -18,7 +18,7 @@ def make_model(classes=2):
      # CREATE MODEL 
     model = ResNet50(include_top=False, input_shape=(None, None, 3), weights='imagenet')
     x = model.output
-    x = SpatialPyramidPooling([1,2,3,4])(x)
+    x = SpatialPyramidPooling([1,2,3,6])(x)
     predictions = Dense(classes, activation='softmax')(x)
     model = Model(inputs=model.input, outputs=predictions, name='resnet50spp_pretrained')
     return model
@@ -29,9 +29,11 @@ if __name__ == "__main__":
     model  = make_model()
 
     model.summary()
-    util = ModelUtils(epochs=80)
+    util = ModelUtils(epochs=100)
     util.get_train_data()
+    util.get_val_data()
     util.get_test_data()
+    util.mean_subtraction()
     util.train(model)
     util.evaluate()
     util.save()

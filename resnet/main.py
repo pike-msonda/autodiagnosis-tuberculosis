@@ -6,23 +6,20 @@ from datetime import datetime
 from keras.applications import ResNet50
 from utils.model_utils import ModelUtils
 
-DATASET_PATH = '../data/train/'
-TEST_PATH = 'D:\Data/test/'
-TEST_PATH_NAME=os.path.join(TEST_PATH, 'china.pkl')
-IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
-MODEL_SIZE=(227, 227)
+MODEL_SIZE=(224, 224)
 
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
-    model = ResNet50(include_top=True, input_shape=(227,227,3), weights=None, classes=2)
+    model = ResNet50(include_top=True, input_shape=(224,224,3), weights=None, classes=2)
     # model = resnet50.model()
 
     model.summary()
 
-    util = ModelUtils(epochs=80)
+    util = ModelUtils(epochs=120)
     util.get_train_data(resize=MODEL_SIZE)
-    util.get_test_data(resize=MODEL_SIZE)
+    # util.get_val_data(resize=MODEL_SIZE)
+    # util.get_test_data(resize=MODEL_SIZE)
     util.train(model)
     util.evaluate()
     util.save()

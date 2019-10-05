@@ -3,10 +3,10 @@
     Description: AlexNet implementation using Keras api
 """
 
-from keras.layers import Input
+from keras.layers import Input, GlobalAveragePooling2D
 from keras.layers.merge import concatenate
 from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D
-from keras.layers.convolutional import MaxPooling2D, AveragePooling2D, ZeroPadding2D
+from keras.layers.convolutional import MaxPooling2D, ZeroPadding2D
 from keras.layers.normalization import BatchNormalization
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
 from keras.models import Model
@@ -53,7 +53,7 @@ class AlexNet:
             padding="valid", max_pooling=True, activation='relu', name='conv_1')
 
         x = BatchNormalization()(x) # apply batch normalisation.
-        x =  ZeroPadding2D((1,1))(x)
+        # x =  ZeroPadding2D((1,1))(x)
 
         # 2nd Layer
         x =  self.conv_layer(x, filters=256, kernel_size=(5,5),strides=(1,1),
@@ -75,19 +75,26 @@ class AlexNet:
 
 
         # 5Th LAYER
-        x =  self.conv_layer(x, filters=256, kernel_size=(3,3),strides=(1,1),
-            padding="same", max_pooling=True, name="conv_5")
-        x = BatchNormalization()(x) # apply batch normalisation.
+        # x =  self.conv_layer(x, filters=256, kernel_size=(3,3),strides=(1,1),
+        #     padding="same", max_pooling=True, name="conv_5")
+        
+        x = Conv2D(filters=256, kernel_size=(3,3), strides=(3,3), padding='same', 
+            activation='relu')(x)
+        x = MaxPooling2D(pool_size=(3,3), strides=(2,2))(x)
+ 
+        x = SpatialPyramidPooling([1,2,3,6])(x)
+           
+        x = Activation('relu')(x)
+        
+        x = BatchNormalization()(x) # appy batch normalisation.
 
         # 6 FLATTEN 
-        x = SpatialPyramidPooling([1,2,3,4])(x)
         # x = Flatten()(x)
-
 
         # Fully Connected LAYER 1
         x = Dense(4096,  kernel_regularizer=l2(0))(x)
-        x = Activation('relu')(x)
         x = Dropout(0.5)(x)
+        x = Activation('relu')(x)
 
         # FULLY CONNECTED LAYER 2
         x = Dense(4096,  kernel_regularizer=l2(0))(x)

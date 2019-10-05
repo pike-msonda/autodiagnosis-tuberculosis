@@ -29,9 +29,11 @@ if __name__ == "__main__":
     model  = make_model()
 
     # model.summary()
-    util = ModelUtils(epochs=80)
+    util = ModelUtils(epochs=100)
     util.get_train_data(resize=MODEL_SIZE)
+    util.get_val_data(resize=MODEL_SIZE)
     util.get_test_data(resize=MODEL_SIZE)
+    util.mean_subtraction()
     util.train(model)
     util.evaluate()
     util.save()

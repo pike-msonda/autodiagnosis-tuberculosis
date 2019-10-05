@@ -21,7 +21,7 @@ def make_model(classes=2):
     x = GlobalAveragePooling2D()(x)
     x = Dense(1024, activation='relu')(x)
     predictions = Dense(classes, activation='softmax')(x)
-    model = Model(inputs=model.input, outputs=predictions)
+    model = Model(inputs=model.input, outputs=predictions, name='inception_v3_pretrained')
     return model
 
     
@@ -30,8 +30,11 @@ if __name__ == "__main__":
     model  = make_model()
 
     model.summary()
-    util = ModelUtils(epochs=200)
+    util = ModelUtils(epochs=100)
     util.get_train_data()
+    util.get_val_data()
+    util.get_test_data()
+    util.mean_subtraction()
     util.train(model)
     util.evaluate()
     util.save()

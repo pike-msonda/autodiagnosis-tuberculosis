@@ -37,6 +37,7 @@ class SpatialPyramidPooling(Layer):
         if self.dim_ordering == 'th':
             self.nb_channels = input_shape[1]
         elif self.dim_ordering == 'tf':
+            # import pdb; pdb.set_trace()
             self.nb_channels = input_shape[3]
 
     def compute_output_shape(self, input_shape):

@@ -12,8 +12,9 @@ IMAGE_PATH = ''
 
 SEED = 1000
 
+FOLDER = 'train'
 AUG_PATH='data' # Store the transformed image into the project folder
-IMAGE_PATH="E:\Pike\Data/train" #  Folder containing all the image to augment.
+IMAGE_PATH="E:\Pike\Data/"+FOLDER #  Folder containing all the image to augment.
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
@@ -59,13 +60,13 @@ def flip_images(X_imgs):
     X_flip = []
     tf.reset_default_graph()
     X = tf.placeholder(tf.uint8, shape = (IMAGE_SIZE, IMAGE_SIZE, 3))
-    # tf_img1 = tf.image.flip_left_right(X)
-    # tf_img2 = tf.image.flip_up_down(X)
+    tf_img1 = tf.image.flip_left_right(X)
+    tf_img2 = tf.image.flip_up_down(X)
     tf_img3 = tf.image.transpose_image(X)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for img in X_imgs:
-            flipped_imgs = sess.run([tf_img3], feed_dict = {X: img})
+            flipped_imgs = sess.run([tf_img1, tf_img2, tf_img3], feed_dict = {X: img})
             X_flip.extend(flipped_imgs)
     X_flip = np.array(X_flip, dtype = np.uint8)
     return X_flip
@@ -97,16 +98,18 @@ def add_augs():
             
             print("{0} Resized to ({1}, {2}".format(len(images), IMAGE_SIZE, IMAGE_SIZE))
 
-            rotated_images=rotate_images(images)
-            print("{0} Images Rotated".format(len(rotated_images)))
+            # rotated_images=rotate_images(images)
+            # print("{0} Images Rotated".format(len(rotated_images)))
 
-            # cropped = random_crop(rotated_images,4)
+
+            # flipped_images = flip_images(rotated_images)
+            cropped = random_crop(images,7)
             # print("Cropped {}".format(len(cropped)))
             
             # aug_images =  np.concatenate((cropped, rotated_images))
             # print("Total auged images {}".format(len(aug_images)))
             
-            save_images(filepath='/'.join([AUG_PATH, 'train', parentdir, subdir]), images=rotated_images, prefix="im")
+            save_images(filepath='/'.join([AUG_PATH, FOLDER, parentdir, subdir]), images=cropped, prefix="im")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):

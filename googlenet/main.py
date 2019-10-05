@@ -1,20 +1,25 @@
 import sys
 sys.path.append("..") 
 from data_utils import *
-from keras.applications.inception_v3 import InceptionV3
+# from googlenet.v1 import InceptionV1
+from googlenet import create_googlenet
+
 from datetime import datetime
 from utils.model_utils import ModelUtils
-
+MODEL_SIZE=(224, 224)
 
 if __name__ == "__main__":
     start = datetime.now()
-    model = InceptionV3( include_top=True, input_shape=(256, 256, 3), weights=None, classes=2)
+    # model = InceptionV1( include_top=True, input_shape=(224, 224, 3), weights=None, classes=2)
     # model = googlelenet.model()
+    model = create_googlenet(weights_path=None, input_shape=(3, 224, 224))
+
     model.summary()
 
-    util = ModelUtils(epochs=80)
-    util.get_train_data()
-    util.get_test_data()
+    util = ModelUtils(epochs=100)
+    util.get_train_data(resize=MODEL_SIZE)
+    util.get_val_data(resize=MODEL_SIZE)
+    util.get_test_data(resize=MODEL_SIZE)
     util.train(model)
     util.evaluate()
     util.save()

@@ -11,8 +11,10 @@ from urllib.parse import urlparse
 from urllib import request
 from io import BytesIO
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg 
 import itertools
 import random
+from albumentations import Compose, CLAHE, RandomCrop, ToFloat
 random.seed(1000)
 np.random.seed(1000)
 _EPSILON = 1e-8
@@ -40,11 +42,19 @@ def random_crop(img, random_crop_size):
     y = np.random.randint(0, height - dy + 1)
     return img[y:(y+dy), x:(x+dx), :]
 
+def apply_clahe():
+    return Compose([
+    CLAHE(p=1.0, clip_limit=2.0),
+    ToFloat(max_value=255,p=1)
+    ], p=1)
 def load_image(in_image):
     # load image
-    img = Image.open(in_image)
-    # img = cv2.imread(in_image)
-    return img
+    # img = Image.open(in_image)
+    img = cv2.imread(in_image)
+    clahe = apply_clahe()
+    enhanced = clahe(**{'image': img})
+    # import pdb; pdb.set_trace()
+    return enhanced['image']
 
 def resize_image(in_image, new_width, new_height, out_image=None,
                  resize_mode=Image.ANTIALIAS):
@@ -87,12 +97,12 @@ def image_dirs_to_samples(directory, resize=None, convert_to_color=False,
         if convert_to_color:
             samples[i] = convert_color(samples[i],'RGB')
 
-        samples[i] = pil_to_nparray(samples[i])
+        # samples[i] = pil_to_nparray(samples[i])
 
         if resize:
             # samples[i] = resize_image(samples[i], resize[0], resize[1])
             samples[i] = random_crop(samples[i], resize)
-        samples[i] /= 255
+        # samples[i] /= 255
     print("Parsing Done!")
     return samples, targets
 

@@ -13,14 +13,13 @@ IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
 if __name__ == "__main__":
     start = datetime.now()
     # CREATE MODEL 
-    alexnet = AlexNet(input_shape=(None,None, 3), classes=2)
+    alexnet = AlexNet(input_shape=(227,227, 3), classes=2)
 
     model = alexnet.model()
     model.summary()
 
-    util = ModelUtils(epochs=80)
+    util = ModelUtils(epochs=120)
     util.get_train_data()
-    util.get_test_data()
     util.train(model)
     util.evaluate()
     util.save()

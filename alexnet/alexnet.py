@@ -52,7 +52,6 @@ class AlexNet:
             padding="valid", max_pooling=True, activation='relu', name='conv_1')
 
         x = BatchNormalization()(x) # apply batch normalisation.
-        x = ZeroPadding2D((1, 1))(x)
 
         # 2nd Layer
         x =  self.conv_layer(x, filters=256, kernel_size=(5,5),strides=(1,1),
@@ -79,11 +78,8 @@ class AlexNet:
             padding="same", max_pooling=True, name="conv_5")
         x = BatchNormalization()(x) # apply batch normalisation.
 
-
-
         # 6 FLATTEN 
         x = Flatten()(x)
-
 
         # Fully Connected LAYER 1
         x = Dense(4096,  kernel_regularizer=l2(0))(x)
