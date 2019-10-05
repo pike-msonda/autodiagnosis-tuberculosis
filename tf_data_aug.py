@@ -3,6 +3,8 @@ import cv2 as openCv
 import tensorflow as tf
 import numpy as np
 import matplotlib.image as mpimg 
+from keras.preprocessing.image import ImageDataGenerator
+
 from PIL import Image
 IMAGE_SIZE = 256
 
@@ -14,7 +16,7 @@ SEED = 1000
 
 FOLDER = 'train'
 AUG_PATH='data' # Store the transformed image into the project folder
-IMAGE_PATH="E:\Pike\Data/"+FOLDER #  Folder containing all the image to augment.
+IMAGE_PATH="D:\Data/"+FOLDER #  Folder containing all the image to augment.
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
@@ -71,6 +73,27 @@ def flip_images(X_imgs):
     X_flip = np.array(X_flip, dtype = np.uint8)
     return X_flip
 
+
+def generate_images(images, total=10, save_dir=None):
+    aug = ImageDataGenerator(
+	rotation_range=90,
+	zoom_range=0.15,
+	width_shift_range=0.2,
+	height_shift_range=0.2,
+	shear_range=0.15,
+	horizontal_flip=True,
+	fill_mode="nearest")
+    count  = 0
+    expanded_images = []
+
+    for im in images:
+        im = np.expand_dims(im, axis=0)
+        count = 0
+        for batch in aug.flow(im, batch_size=1, save_to_dir=save_dir, save_prefix="image", save_format="png"):
+            count += 1
+            if count == total:
+                break
+
 def random_crop(images, samples=2):
     x_random_crops = []
     tf.reset_default_graph()
@@ -97,19 +120,19 @@ def add_augs():
             images = resize_images(os.path.join(IMAGE_PATH, parentdir, subdir))
             
             print("{0} Resized to ({1}, {2}".format(len(images), IMAGE_SIZE, IMAGE_SIZE))
-
+            
             # rotated_images=rotate_images(images)
             # print("{0} Images Rotated".format(len(rotated_images)))
 
-
+            generate_images(images=images,save_dir='/'.join([AUG_PATH, FOLDER, parentdir, subdir]))
             # flipped_images = flip_images(rotated_images)
-            cropped = random_crop(images,7)
+            # cropped = random_crop(images,7)
             # print("Cropped {}".format(len(cropped)))
             
             # aug_images =  np.concatenate((cropped, rotated_images))
             # print("Total auged images {}".format(len(aug_images)))
             
-            save_images(filepath='/'.join([AUG_PATH, FOLDER, parentdir, subdir]), images=cropped, prefix="im")
+            # save_images(filepath='/'.join([AUG_PATH, FOLDER, parentdir, subdir]), images=cropped, prefix="im")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):
