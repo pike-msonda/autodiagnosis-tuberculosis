@@ -111,7 +111,7 @@ class SpatialPyramidPooling(Layer):
         elif self.dim_ordering == 'tf':
             #outputs = K.concatenate(outputs,axis = 1)
             outputs = K.concatenate(outputs)
-            #outputs = K.reshape(outputs,(len(self.pool_list),self.num_outputs_per_channel,input_shape[0],input_shape[1]))
+            # outputs = K.reshape(outputs,(len(self.pool_list),self.num_outputs_per_channel,input_shape[0],input_shape[1]))
             #outputs = K.permute_dimensions(outputs,(3,1,0,2))
             #outputs = K.reshape(outputs,(input_shape[0], self.num_outputs_per_channel * self.nb_channels))
 

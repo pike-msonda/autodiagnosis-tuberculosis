@@ -17,7 +17,9 @@ if __name__ == "__main__":
     model.summary()
 
     util = ModelUtils(epochs=120)
-    util.get_train_data()
+    util.get_train_data(resize=(MODEL_SIZE))
+    # util.get_val_data(resize=(MODEL_SIZE))
+
     util.train(model)
     util.evaluate()
     util.save()

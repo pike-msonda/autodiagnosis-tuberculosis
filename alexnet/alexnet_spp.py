@@ -82,8 +82,7 @@ class AlexNet:
             activation='relu')(x)
         x = MaxPooling2D(pool_size=(3,3), strides=(2,2))(x)
  
-        x = SpatialPyramidPooling([1,2,3,6])(x)
-           
+        x = SpatialPyramidPooling([1,2,4])(x)
         x = Activation('relu')(x)
         
         x = BatchNormalization()(x) # appy batch normalisation.

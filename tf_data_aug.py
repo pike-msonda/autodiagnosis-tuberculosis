@@ -16,7 +16,7 @@ SEED = 1000
 
 FOLDER = 'train'
 AUG_PATH='data' # Store the transformed image into the project folder
-IMAGE_PATH="D:\Data/"+FOLDER #  Folder containing all the image to augment.
+IMAGE_PATH="E:\Pike\Data/"+FOLDER #  Folder containing all the image to augment.
 
 def resize_images(filepath, width=256, height=256):
     resized_images = []
@@ -76,7 +76,7 @@ def flip_images(X_imgs):
 
 def generate_images(images, total=10, save_dir=None):
     aug = ImageDataGenerator(
-	rotation_range=90,
+	# rotation_range=90,
 	zoom_range=0.15,
 	width_shift_range=0.2,
 	height_shift_range=0.2,
@@ -91,7 +91,7 @@ def generate_images(images, total=10, save_dir=None):
         count = 0
         for batch in aug.flow(im, batch_size=1, save_to_dir=save_dir, save_prefix="image", save_format="png"):
             count += 1
-            if count == total:
+            if count > total:
                 break
 
 def random_crop(images, samples=2):
@@ -124,15 +124,15 @@ def add_augs():
             # rotated_images=rotate_images(images)
             # print("{0} Images Rotated".format(len(rotated_images)))
 
-            generate_images(images=images,save_dir='/'.join([AUG_PATH, FOLDER, parentdir, subdir]))
+            # generate_images(images=images,total=10, save_dir='/'.join([AUG_PATH, FOLDER, parentdir, subdir]))
             # flipped_images = flip_images(rotated_images)
-            # cropped = random_crop(images,7)
-            # print("Cropped {}".format(len(cropped)))
+            cropped = random_crop(images, 3)
+            print("Cropped {}".format(len(cropped)))
             
             # aug_images =  np.concatenate((cropped, rotated_images))
             # print("Total auged images {}".format(len(aug_images)))
             
-            # save_images(filepath='/'.join([AUG_PATH, FOLDER, parentdir, subdir]), images=cropped, prefix="im")
+            save_images(filepath='/'.join([AUG_PATH, FOLDER, parentdir, subdir]), images=cropped, prefix="im")
         
 def create_dataset():
      for parentdir in os.listdir(AUG_PATH):

@@ -3,7 +3,8 @@ sys.path.append("..")
 from data_utils import *
 from datetime import datetime
 from keras.models import Model
-from keras.applications import ResNet50
+# from keras.applications import ResNet50
+from resnet.resnet50 import ResNet50
 from keras.layers import GlobalAveragePooling2D, Dense, GlobalMaxPooling2D, Dropout
 from utils.model_utils import ModelUtils
 from custom_layers.spatial_pyramid_pooling import SpatialPyramidPooling
@@ -12,16 +13,13 @@ DATASET_PATH = '../data/train/'
 TEST_PATH = 'D:\Data/test/'
 TEST_PATH_NAME=os.path.join(TEST_PATH, 'china.pkl')
 IMAGESET_NAME = os.path.join(DATASET_PATH, 'china.pkl')
+MODEL_SIZE=(224, 224)
+
 
 
 def make_model(classes=2):
      # CREATE MODEL 
-    model = ResNet50(include_top=False, input_shape=(None, None, 3), weights=None)
-    x = model.output
-    x = SpatialPyramidPooling([1,2,3,6])(x)
-    # x = Dense(1024, activation='relu')(x)
-    predictions = Dense(classes, activation='softmax')(x)
-    model = Model(inputs=model.input, outputs=predictions, name='resnet50_spp')
+    model = ResNet50(include_top=True, input_shape=(224, 224, 3),  weights=None, classes=2)
     return model
 
     
@@ -30,8 +28,8 @@ if __name__ == "__main__":
     model = make_model()
 
     model.summary()
-    util = ModelUtils(epochs=100)
-    util.get_train_data()
+    util = ModelUtils(epochs=120)
+    util.get_train_data(resize=MODEL_SIZE)
     # util.get_val_data()
     # util.get_test_data()
     util.train(model)
