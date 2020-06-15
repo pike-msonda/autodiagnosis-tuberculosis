@@ -16,7 +16,7 @@ tf.set_random_seed(1000)
 random.seed(1000)
 np.random.seed(1000)
 
-FOLDER = 'china'
+FOLDER = 'turkey'
 class ModelUtils():
 
     def __init__(self, epochs=2,test_split=0.30, validation_split=0.25):
