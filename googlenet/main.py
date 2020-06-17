@@ -20,7 +20,10 @@ if __name__ == "__main__":
     util.evaluate()
     util.save()
     util.confusion_matrix()
-    util.plot_loss_accuracy()
+    # util.plot_roc_curve()
+
+    # util.plot_loss_accuracy()
+    # util.plot_multiple_roc(model, (224, 224))
     
     time_elapsed = datetime.now() - start 
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
