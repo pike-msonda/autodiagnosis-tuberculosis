@@ -4,7 +4,10 @@ from data_utils import *
 from alexnet import AlexNet
 from datetime import datetime
 from utils.model_utils import ModelUtils
-
+import tensorflow as tf
+tf.set_random_seed(1000)
+random.seed(1000)
+np.random.seed(1000)
 MODEL_SIZE=(227, 227)
 
 if __name__ == "__main__":
@@ -17,7 +20,7 @@ if __name__ == "__main__":
     model.summary()
 
     util = ModelUtils(epochs=120)
-    # util.get_train_data(resize=(MODEL_SIZE))
+    util.get_train_data()
     # util.get_val_data(resize=(MODEL_SIZE))
 
     # util.train(model)

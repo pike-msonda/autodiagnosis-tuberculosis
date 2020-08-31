@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     model.summary()
     util = ModelUtils(epochs=120)
-    # util.get_train_data(resize=MODEL_SIZE)
+    # util.get_train_data(resize=(224, 224))
     # util.get_val_data()
     # util.get_test_data()
     # util.train(model)

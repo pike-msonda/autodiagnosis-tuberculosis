@@ -2,7 +2,6 @@ from __future__ import division, print_function, absolute_import
 import os
 import csv
 import cv2
-import random
 import numpy as np
 from PIL import Image
 import pickle
@@ -15,7 +14,6 @@ import matplotlib.image as mpimg
 import itertools
 import random
 from albumentations import Compose, CLAHE, RandomCrop, ToFloat
-random.seed(1000)
 np.random.seed(1000)
 _EPSILON = 1e-8
 
@@ -111,6 +109,7 @@ def shuffle(*arrs):
     for i, arr in enumerate(arrs):
         assert len(arrs[0]) == len(arrs[i])
         arrs[i] = np.array(arr)
+    np.random.seed(1000)
     p = np.random.permutation(len(arrs[0]))
     return tuple(arr[p] for arr in arrs)
 

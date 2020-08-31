@@ -17,9 +17,10 @@ if __name__ == "__main__":
 
     model = alexnet.model()
     model.summary()
+    import pdb; pdb.set_trace()
 
     util = ModelUtils(epochs=120)
-    # util.get_train_data(resize=(227, 227))
+    # util.get_train_data()
     # util.get_val_data(resize=(227, 227))
 
     # util.train(model)
